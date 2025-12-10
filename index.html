@@ -1142,14 +1142,12 @@
             const hours = String(now.getHours()).padStart(2, '0');
             const minutes = String(now.getMinutes()).padStart(2, '0');
             
-            // 设置开始时间为1小时前（仅在表单为空时）
+            // 设置开始时间为当前北京时间
+            const datetimeLocalNow = `${year}-${month}-${day}T${hours}:${minutes}`;
+            
+            // 只有在表单为空时才设置默认值
             if (!startTimeEl.value) {
-                const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000);
-                const startHours = String(oneHourAgo.getHours()).padStart(2, '0');
-                const startMinutes = String(oneHourAgo.getMinutes()).padStart(2, '0');
-                
-                const datetimeLocalOneHourAgo = `${year}-${month}-${day}T${startHours}:${startMinutes}`;
-                startTimeEl.value = datetimeLocalOneHourAgo;
+                startTimeEl.value = datetimeLocalNow;
             }
             
             // 结束时间默认为空
@@ -1823,163 +1821,210 @@
                         copyBtn.style.borderColor = 'var(--success-color)';
                         copyBtn.style.color = 'var(--success-color)';
                         
+                        setTimeout(() => {
+                            copyBtn.innerHTML = originalText;
+                            copyBtn.style.background = '';
+                            copyBtn.style.borderColor = '';
+                            copyBtn.style.color = '';
+                        }, 2000);
+                    }
+                } else {
+                    showToast('复制失败，请手动选择文本复制', 'error');
+                }
+            } catch (error) {
+                console.error('回退复制失败:', error);
+                showToast('复制失败，请手动选择文本复制', 'error');
+            }
+        }
+        
+        // 复制格式文本 - 修复版本
+        window.copyFormatText = function(orderId, formatType) {
+            try {
+                // 找到对应的订单元素
+                const orderElement = document.querySelector(`.order-item[data-id="${orderId}"]`);
+                if (!orderElement) {
+                    showToast('未找到订单', 'error');
+                    return;
+                }
+                
+                // 获取存储在data属性中的格式文本
+                const formatText = orderElement.getAttribute('data-format-text');
+                if (!formatText) {
+                    showToast('未找到格式文本', 'error');
+                    return;
+                }
+                
+                // 使用现代 Clipboard API
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(formatText).then(() => {
+                        showToast('格式文本已复制到剪贴板！', 'success');
+                        
+                        // 找到对应的复制按钮并给视觉反馈
+                        const copyFormatBtn = orderElement.querySelector(`.copy-format-btn[onclick*="copyFormatText(${orderId}, '${formatType}')"]`);
+                        if (copyFormatBtn) {
+                            const originalText = copyFormatBtn.innerHTML;
+                            copyFormatBtn.innerHTML = '<i class="fas fa-check"></i> 已复制';
+                            copyFormatBtn.style.background = 'rgba(64, 192, 87, 0.3)';
+                            copyFormatBtn.style.borderColor = 'var(--success-color)';
+                            copyFormatBtn.style.color = 'var(--success-color)';
+                            
                             setTimeout(() => {
-                                copyBtn.innerHTML = originalText;
-                                copyBtn.style.background = '';
-                                copyBtn.style.borderColor = '';
-                                copyBtn.style.color = '';
+                                copyFormatBtn.innerHTML = originalText;
+                                copyFormatBtn.style.background = '';
+                                copyFormatBtn.style.borderColor = '';
+                                copyFormatBtn.style.color = '';
                             }, 2000);
                         }
-                    } else {
-                        showToast('复制失败，请手动选择文本复制', 'error');
-                    }
-                } catch (error) {
-                    console.error('回退复制失败:', error);
-                    showToast('复制失败，请手动选择文本复制', 'error');
+                    }).catch(err => {
+                        console.error('复制格式文本失败:', err);
+                        fallbackCopyText(formatText);
+                    });
+                } else {
+                    // 老浏览器回退方案
+                    fallbackCopyText(formatText);
+                }
+            } catch (error) {
+                console.error('复制格式文本过程中出错:', error);
+                showToast('复制失败，请重试', 'error');
+            }
+        };
+        
+        // ============ 修复的复制功能函数结束 ============
+        
+        // 编辑订单
+        window.editOrder = function(id) {
+            const orderIndex = pendingOrders.findIndex(order => order.id === id);
+            if (orderIndex === -1) return;
+            
+            const order = pendingOrders[orderIndex];
+            editingOrderId = id;
+            editSelectedPrice = order.pricePerHour || null;
+            
+            // 填充表单
+            editPricePerHourEl.value = order.pricePerHour || '';
+            editCompanionNameEl.value = order.companionName;
+            editBossNameEl.value = order.bossName;
+            editStartTimeEl.value = formatDateTimeForInput(new Date(order.startTime));
+            editEndTimeEl.value = order.endTime ? formatDateTimeForInput(new Date(order.endTime)) : '';
+            
+            // 设置价格按钮选择状态
+            editPriceButtons.forEach(btn => {
+                if (parseFloat(btn.dataset.price) === order.pricePerHour) {
+                    btn.classList.add('selected');
+                } else {
+                    btn.classList.remove('selected');
+                }
+            });
+            
+            // 显示模态框
+            editOrderModal.style.display = 'flex';
+        };
+        
+        // 完成订单
+        window.completeOrder = function(id) {
+            const orderIndex = pendingOrders.findIndex(order => order.id === id);
+            if (orderIndex === -1) return;
+            
+            if (confirm('确定要结束这个订单吗？')) {
+                const now = new Date();
+                const datetimeLocal = formatDateTimeForInput(now);
+                
+                pendingOrders[orderIndex].endTime = datetimeLocal;
+                pendingOrders[orderIndex].status = 'completed';
+                saveToLocalStorage();
+                updatePendingOrdersDisplay();
+                updateBossStatistics();
+                showToast('订单已结束！', 'success');
+            }
+        };
+        
+        // 删除订单
+        window.deleteOrder = function(id) {
+            if (confirm('确定要删除这个订单吗？')) {
+                pendingOrders = pendingOrders.filter(order => order.id !== id);
+                saveToLocalStorage();
+                updatePendingOrdersDisplay();
+                updateBossStatistics();
+                showToast('订单已删除！', 'success');
+            }
+        };
+        
+        // 保存编辑
+        saveEditBtn.addEventListener('click', function() {
+            if (!editingOrderId) return;
+            
+            const orderIndex = pendingOrders.findIndex(order => order.id === editingOrderId);
+            if (orderIndex === -1) return;
+            
+            const pricePerHour = editSelectedPrice || parseFloat(editPricePerHourEl.value) || 0;
+            const companionName = editCompanionNameEl.value || '未填写';
+            const bossName = editBossNameEl.value || '散客';
+            const startTime = editStartTimeEl.value;
+            const endTime = editEndTimeEl.value || null;
+            
+            if (endTime) {
+                const start = new Date(startTime);
+                const end = new Date(endTime);
+                
+                if (end <= start) {
+                    showToast('结束时间不能早于开始时间', 'error');
+                    return;
                 }
             }
             
-            // 复制格式文本 - 修复版本
-            window.copyFormatText = function(orderId, formatType) {
-                try {
-                    // 找到对应的订单元素
-                    const orderElement = document.querySelector(`.order-item[data-id="${orderId}"]`);
-                    if (!orderElement) {
-                        showToast('未找到订单', 'error');
-                        return;
-                    }
-                    
-                    // 获取存储在data属性中的格式文本
-                    const formatText = orderElement.getAttribute('data-format-text');
-                    if (!formatText) {
-                        showToast('未找到格式文本', 'error');
-                        return;
-                    }
-                    
-                    // 使用现代 Clipboard API
-                    if (navigator.clipboard && navigator.clipboard.writeText) {
-                        navigator.clipboard.writeText(formatText).then(() => {
-                            showToast('格式文本已复制到剪贴板！', 'success');
-                            
-                            // 找到对应的复制按钮并给视觉反馈
-                            const copyFormatBtn = orderElement.querySelector(`.copy-format-btn[onclick*="copyFormatText(${orderId}, '${formatType}')"]`);
-                            if (copyFormatBtn) {
-                                const originalText = copyFormatBtn.innerHTML;
-                                copyFormatBtn.innerHTML = '<i class="fas fa-check"></i> 已复制';
-                                copyFormatBtn.style.background = 'rgba(64, 192, 87, 0.3)';
-                                copyFormatBtn.style.borderColor = 'var(--success-color)';
-                                copyFormatBtn.style.color = 'var(--success-color)';
-                                
-                                setTimeout(() => {
-                                    copyFormatBtn.innerHTML = originalText;
-                                    copyFormatBtn.style.background = '';
-                                    copyFormatBtn.style.borderColor = '';
-                                    copyFormatBtn.style.color = '';
-                                }, 2000);
-                            }
-                        }).catch(err => {
-                            console.error('复制格式文本失败:', err);
-                            fallbackCopyText(formatText);
-                        });
-                    } else {
-                        // 老浏览器回退方案
-                        fallbackCopyText(formatText);
-                    }
-                } catch (error) {
-                    console.error('复制格式文本过程中出错:', error);
-                    showToast('复制失败，请重试', 'error');
-                }
-            };
+            pendingOrders[orderIndex].pricePerHour = pricePerHour;
+            pendingOrders[orderIndex].companionName = companionName;
+            pendingOrders[orderIndex].bossName = bossName;
+            pendingOrders[orderIndex].startTime = startTime;
+            pendingOrders[orderIndex].endTime = endTime;
+            pendingOrders[orderIndex].status = endTime ? 'completed' : 'pending';
             
-            // ============ 修复的复制功能函数结束 ============
+            saveToLocalStorage();
+            updatePendingOrdersDisplay();
+            updateBossStatistics();
             
-            // 编辑订单
-            window.editOrder = function(id) {
-                const orderIndex = pendingOrders.findIndex(order => order.id === id);
-                if (orderIndex === -1) return;
-                
-                const order = pendingOrders[orderIndex];
-                editingOrderId = id;
-                editSelectedPrice = order.pricePerHour || null;
-                
-                // 填充表单
-                editPricePerHourEl.value = order.pricePerHour || '';
-                editCompanionNameEl.value = order.companionName;
-                editBossNameEl.value = order.bossName;
-                editStartTimeEl.value = formatDateTimeForInput(new Date(order.startTime));
-                editEndTimeEl.value = order.endTime ? formatDateTimeForInput(new Date(order.endTime)) : '';
-                
-                // 设置价格按钮选择状态
-                editPriceButtons.forEach(btn => {
-                    if (parseFloat(btn.dataset.price) === order.pricePerHour) {
-                        btn.classList.add('selected');
-                    } else {
-                        btn.classList.remove('selected');
-                    }
-                });
-                
-                // 显示模态框
-                editOrderModal.style.display = 'flex';
-            };
+            editOrderModal.style.display = 'none';
+            editingOrderId = null;
+            editSelectedPrice = null;
             
-            // 完成订单
-            window.completeOrder = function(id) {
-                const orderIndex = pendingOrders.findIndex(order => order.id === id);
-                if (orderIndex === -1) return;
-                
-                if (confirm('确定要结束这个订单吗？')) {
-                    const now = new Date();
-                    const datetimeLocal = formatDateTimeForInput(now);
-                    
-                    pendingOrders[orderIndex].endTime = datetimeLocal;
-                    pendingOrders[orderIndex].status = 'completed';
-                    saveToLocalStorage();
-                    updatePendingOrdersDisplay();
-                    updateBossStatistics();
-                    showToast('订单已结束！', 'success');
-                }
-            };
+            showToast('订单已更新！', 'success');
+        });
+        
+        // 在编辑模态框中结束订单
+        editCompleteBtn.addEventListener('click', function() {
+            if (!editingOrderId) return;
             
-            // 删除订单
-            window.deleteOrder = function(id) {
-                if (confirm('确定要删除这个订单吗？')) {
-                    pendingOrders = pendingOrders.filter(order => order.id !== id);
-                    saveToLocalStorage();
-                    updatePendingOrdersDisplay();
-                    updateBossStatistics();
-                    showToast('订单已删除！', 'success');
-                }
-            };
+            const orderIndex = pendingOrders.findIndex(order => order.id === editingOrderId);
+            if (orderIndex === -1) return;
             
-            // 保存编辑
-            saveEditBtn.addEventListener('click', function() {
-                if (!editingOrderId) return;
-                
-                const orderIndex = pendingOrders.findIndex(order => order.id === editingOrderId);
-                if (orderIndex === -1) return;
-                
-                const pricePerHour = editSelectedPrice || parseFloat(editPricePerHourEl.value) || 0;
-                const companionName = editCompanionNameEl.value || '未填写';
-                const bossName = editBossNameEl.value || '散客';
-                const startTime = editStartTimeEl.value;
-                const endTime = editEndTimeEl.value || null;
-                
-                if (endTime) {
-                    const start = new Date(startTime);
-                    const end = new Date(endTime);
-                    
-                    if (end <= start) {
-                        showToast('结束时间不能早于开始时间', 'error');
-                        return;
-                    }
-                }
-                
+            const pricePerHour = editSelectedPrice || parseFloat(editPricePerHourEl.value) || 0;
+            const companionName = editCompanionNameEl.value || '未填写';
+            const bossName = editBossNameEl.value || '散客';
+            const startTime = editStartTimeEl.value;
+            
+            let endTime = editEndTimeEl.value;
+            
+            if (!endTime) {
+                const now = new Date();
+                endTime = formatDateTimeForInput(now);
+                editEndTimeEl.value = endTime;
+            }
+            
+            const start = new Date(startTime);
+            const end = new Date(endTime);
+            
+            if (end <= start) {
+                showToast('结束时间不能早于开始时间', 'error');
+                return;
+            }
+            
+            if (confirm('确定要结束这个订单吗？')) {
                 pendingOrders[orderIndex].pricePerHour = pricePerHour;
                 pendingOrders[orderIndex].companionName = companionName;
                 pendingOrders[orderIndex].bossName = bossName;
                 pendingOrders[orderIndex].startTime = startTime;
                 pendingOrders[orderIndex].endTime = endTime;
-                pendingOrders[orderIndex].status = endTime ? 'completed' : 'pending';
+                pendingOrders[orderIndex].status = 'completed';
                 
                 saveToLocalStorage();
                 updatePendingOrdersDisplay();
@@ -1989,330 +2034,283 @@
                 editingOrderId = null;
                 editSelectedPrice = null;
                 
-                showToast('订单已更新！', 'success');
-            });
-            
-            // 在编辑模态框中结束订单
-            editCompleteBtn.addEventListener('click', function() {
-                if (!editingOrderId) return;
-                
-                const orderIndex = pendingOrders.findIndex(order => order.id === editingOrderId);
-                if (orderIndex === -1) return;
-                
-                const pricePerHour = editSelectedPrice || parseFloat(editPricePerHourEl.value) || 0;
-                const companionName = editCompanionNameEl.value || '未填写';
-                const bossName = editBossNameEl.value || '散客';
-                const startTime = editStartTimeEl.value;
-                
-                let endTime = editEndTimeEl.value;
-                
-                if (!endTime) {
-                    const now = new Date();
-                    endTime = formatDateTimeForInput(now);
-                    editEndTimeEl.value = endTime;
-                }
-                
-                const start = new Date(startTime);
-                const end = new Date(endTime);
-                
-                if (end <= start) {
-                    showToast('结束时间不能早于开始时间', 'error');
-                    return;
-                }
-                
-                if (confirm('确定要结束这个订单吗？')) {
-                    pendingOrders[orderIndex].pricePerHour = pricePerHour;
-                    pendingOrders[orderIndex].companionName = companionName;
-                    pendingOrders[orderIndex].bossName = bossName;
-                    pendingOrders[orderIndex].startTime = startTime;
-                    pendingOrders[orderIndex].endTime = endTime;
-                    pendingOrders[orderIndex].status = 'completed';
-                    
-                    saveToLocalStorage();
-                    updatePendingOrdersDisplay();
-                    updateBossStatistics();
-                    
-                    editOrderModal.style.display = 'none';
-                    editingOrderId = null;
-                    editSelectedPrice = null;
-                    
-                    showToast('订单已结束！', 'success');
-                }
-            });
-            
-            // 关闭编辑模态框
-            closeEditModalBtn.addEventListener('click', function() {
+                showToast('订单已结束！', 'success');
+            }
+        });
+        
+        // 关闭编辑模态框
+        closeEditModalBtn.addEventListener('click', function() {
+            editOrderModal.style.display = 'none';
+            editingOrderId = null;
+            editSelectedPrice = null;
+        });
+        
+        cancelEditBtn.addEventListener('click', function() {
+            editOrderModal.style.display = 'none';
+            editingOrderId = null;
+            editSelectedPrice = null;
+        });
+        
+        // 点击模态框外部关闭
+        editOrderModal.addEventListener('click', function(e) {
+            if (e.target === editOrderModal) {
                 editOrderModal.style.display = 'none';
                 editingOrderId = null;
                 editSelectedPrice = null;
-            });
-            
-            cancelEditBtn.addEventListener('click', function() {
-                editOrderModal.style.display = 'none';
-                editingOrderId = null;
-                editSelectedPrice = null;
-            });
-            
-            // 点击模态框外部关闭
-            editOrderModal.addEventListener('click', function(e) {
-                if (e.target === editOrderModal) {
-                    editOrderModal.style.display = 'none';
-                    editingOrderId = null;
-                    editSelectedPrice = null;
-                }
-            });
-            
-            // 关闭老板详情模态框
-            closeBossDetailModalBtn.addEventListener('click', function() {
+            }
+        });
+        
+        // 关闭老板详情模态框
+        closeBossDetailModalBtn.addEventListener('click', function() {
+            bossDetailModal.style.display = 'none';
+        });
+        
+        closeBossDetailBtn.addEventListener('click', function() {
+            bossDetailModal.style.display = 'none';
+        });
+        
+        // 点击老板详情模态框外部关闭
+        bossDetailModal.addEventListener('click', function(e) {
+            if (e.target === bossDetailModal) {
                 bossDetailModal.style.display = 'none';
+            }
+        });
+        
+        // 价格按钮事件处理
+        priceButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                priceButtons.forEach(btn => btn.classList.remove('selected'));
+                this.classList.add('selected');
+                selectedPrice = parseFloat(this.dataset.price);
+                pricePerHourEl.value = selectedPrice;
             });
-            
-            closeBossDetailBtn.addEventListener('click', function() {
-                bossDetailModal.style.display = 'none';
+        });
+        
+        editPriceButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                editPriceButtons.forEach(btn => btn.classList.remove('selected'));
+                this.classList.add('selected');
+                editSelectedPrice = parseFloat(this.dataset.price);
+                editPricePerHourEl.value = editSelectedPrice;
             });
-            
-            // 点击老板详情模态框外部关闭
-            bossDetailModal.addEventListener('click', function(e) {
-                if (e.target === bossDetailModal) {
-                    bossDetailModal.style.display = 'none';
-                }
-            });
-            
-            // 价格按钮事件处理
-            priceButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    priceButtons.forEach(btn => btn.classList.remove('selected'));
-                    this.classList.add('selected');
-                    selectedPrice = parseFloat(this.dataset.price);
-                    pricePerHourEl.value = selectedPrice;
-                });
-            });
-            
-            editPriceButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    editPriceButtons.forEach(btn => btn.classList.remove('selected'));
-                    this.classList.add('selected');
-                    editSelectedPrice = parseFloat(this.dataset.price);
-                    editPricePerHourEl.value = editSelectedPrice;
-                });
-            });
-            
-            // 手动输入价格时清除按钮选择
-            pricePerHourEl.addEventListener('input', function() {
-                if (this.value && parseFloat(this.value) !== selectedPrice) {
-                    priceButtons.forEach(btn => btn.classList.remove('selected'));
-                    selectedPrice = null;
-                }
-            });
-            
-            editPricePerHourEl.addEventListener('input', function() {
-                if (this.value && parseFloat(this.value) !== editSelectedPrice) {
-                    editPriceButtons.forEach(btn => btn.classList.remove('selected'));
-                    editSelectedPrice = null;
-                }
-            });
-            
-            // 事件监听器
-            setNowBtn.addEventListener('click', function() {
-                const now = new Date();
-                const datetimeLocal = formatDateTimeForInput(now);
-                startTimeEl.value = datetimeLocal;
-                
-                timeResults.style.display = 'none';
-                costResults.style.display = 'none';
-            });
-            
-            setCurrentBtn.addEventListener('click', function() {
-                const now = new Date();
-                const datetimeLocal = formatDateTimeForInput(now);
-                endTimeEl.value = datetimeLocal;
-                
-                timeResults.style.display = 'none';
-                costResults.style.display = 'none';
-            });
-            
-            editSetCurrentBtn.addEventListener('click', function() {
-                const now = new Date();
-                const datetimeLocal = formatDateTimeForInput(now);
-                editEndTimeEl.value = datetimeLocal;
-            });
-            
-            calculateTimeBtn.addEventListener('click', displayTimeResults);
-            calculateCostBtn.addEventListener('click', displayCostResults);
-            addToPendingBtn.addEventListener('click', addToPendingOrders);
-            
-            resetBtn.addEventListener('click', function() {
-                pricePerHourEl.value = '';
-                companionNameEl.value = '';
-                bossNameEl.value = '';
-                initializeTimes();
-                timeResults.style.display = 'none';
-                costResults.style.display = 'none';
-                
+        });
+        
+        // 手动输入价格时清除按钮选择
+        pricePerHourEl.addEventListener('input', function() {
+            if (this.value && parseFloat(this.value) !== selectedPrice) {
                 priceButtons.forEach(btn => btn.classList.remove('selected'));
                 selectedPrice = null;
+            }
+        });
+        
+        editPricePerHourEl.addEventListener('input', function() {
+            if (this.value && parseFloat(this.value) !== editSelectedPrice) {
+                editPriceButtons.forEach(btn => btn.classList.remove('selected'));
+                editSelectedPrice = null;
+            }
+        });
+        
+        // 事件监听器
+        setNowBtn.addEventListener('click', function() {
+            const now = new Date();
+            const datetimeLocal = formatDateTimeForInput(now);
+            startTimeEl.value = datetimeLocal;
+            
+            timeResults.style.display = 'none';
+            costResults.style.display = 'none';
+        });
+        
+        setCurrentBtn.addEventListener('click', function() {
+            const now = new Date();
+            const datetimeLocal = formatDateTimeForInput(now);
+            endTimeEl.value = datetimeLocal;
+            
+            timeResults.style.display = 'none';
+            costResults.style.display = 'none';
+        });
+        
+        editSetCurrentBtn.addEventListener('click', function() {
+            const now = new Date();
+            const datetimeLocal = formatDateTimeForInput(now);
+            editEndTimeEl.value = datetimeLocal;
+        });
+        
+        calculateTimeBtn.addEventListener('click', displayTimeResults);
+        calculateCostBtn.addEventListener('click', displayCostResults);
+        addToPendingBtn.addEventListener('click', addToPendingOrders);
+        
+        resetBtn.addEventListener('click', function() {
+            pricePerHourEl.value = '';
+            companionNameEl.value = '';
+            bossNameEl.value = '';
+            initializeTimes();
+            timeResults.style.display = 'none';
+            costResults.style.display = 'none';
+            
+            priceButtons.forEach(btn => btn.classList.remove('selected'));
+            selectedPrice = null;
+            
+            showToast('表单已重置', 'info');
+        });
+        
+        // 清除所有订单
+        document.getElementById('clear-all-btn').addEventListener('click', function() {
+            if (pendingOrders.length === 0) {
+                showToast('没有订单可清除', 'info');
+                return;
+            }
+            
+            if (confirm('确定要清除所有订单吗？此操作不可撤销。')) {
+                pendingOrders = [];
+                saveToLocalStorage();
+                updatePendingOrdersDisplay();
+                updateBossStatistics();
+                showToast('所有订单已清除', 'success');
+            }
+        });
+        
+        // 导出数据
+        document.getElementById('export-btn').addEventListener('click', function() {
+            if (pendingOrders.length === 0) {
+                showToast('没有订单可导出', 'info');
+                return;
+            }
+            
+            const csv = convertOrdersToCSV();
+            const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `枫枫电竞订单_${new Date().toLocaleDateString('zh-CN').replace(/\//g, '-')}.csv`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            showToast('订单数据已导出为CSV文件', 'success');
+        });
+        
+        function convertOrdersToCSV() {
+            let csv = '订单ID,陪玩名称,老板名称,开始时间,结束时间,单价,状态,创建时间,计费时长,总费用\n';
+            
+            pendingOrders.forEach(order => {
+                const timeResult = calculateTimeDifference(order.startTime, order.endTime);
+                const totalCost = order.pricePerHour > 0 && !timeResult.error ? 
+                    (timeResult.billableHoursNum * order.pricePerHour).toFixed(2) : '0.00';
                 
-                showToast('表单已重置', 'info');
+                csv += `"${order.id}","${order.companionName}","${order.bossName}","${formatDateTimeForDisplay(new Date(order.startTime))}",`;
+                csv += `"${order.endTime ? formatDateTimeForDisplay(new Date(order.endTime)) : ''}","${order.pricePerHour}","${order.status}",`;
+                csv += `"${formatDateTimeForDisplay(new Date(order.createdAt))}","${timeResult.billableHours}","${totalCost}"\n`;
             });
             
-            // 清除所有订单
-            document.getElementById('clear-all-btn').addEventListener('click', function() {
-                if (pendingOrders.length === 0) {
-                    showToast('没有订单可清除', 'info');
-                    return;
-                }
-                
-                if (confirm('确定要清除所有订单吗？此操作不可撤销。')) {
-                    pendingOrders = [];
-                    saveToLocalStorage();
+            return csv;
+        }
+        
+        // 显示提示消息
+        function showToast(message, type = 'info') {
+            // 移除现有提示
+            const existingToast = document.querySelector('.toast');
+            if (existingToast) existingToast.remove();
+            
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.textContent = message;
+            toast.style.cssText = `
+                position: fixed;
+                top: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: ${type === 'success' ? 'rgba(64, 192, 87, 0.9)' : 
+                           type === 'error' ? 'rgba(255, 107, 107, 0.9)' : 
+                           type === 'warning' ? 'rgba(255, 204, 0, 0.9)' : 'rgba(77, 171, 247, 0.9)'};
+                color: white;
+                padding: 12px 24px;
+                border-radius: 10px;
+                z-index: 9999;
+                font-weight: 500;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                animation: slideIn 0.3s ease;
+            `;
+            
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+        
+        // 添加CSS动画
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { top: -50px; opacity: 0; }
+                to { top: 20px; opacity: 1; }
+            }
+            @keyframes slideOut {
+                from { top: 20px; opacity: 1; }
+                to { top: -50px; opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // 防止键盘弹起时页面变形
+        window.addEventListener('resize', () => {
+            if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') {
+                window.scrollTo(0, 0);
+            }
+        });
+        
+        // 初始化
+        function init() {
+            // 隐藏加载动画
+            setTimeout(() => {
+                document.getElementById('loading').style.display = 'none';
+            }, 500);
+            
+            // 更新时间显示
+            updateCurrentTime();
+            setInterval(updateCurrentTime, 1000);
+            
+            // 从localStorage加载数据
+            loadFromLocalStorage();
+            
+            // 初始化时间输入（仅在表单为空时设置默认值）
+            initializeTimes();
+            
+            // 加载待结束订单
+            updatePendingOrdersDisplay();
+            
+            // 添加PWA支持
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('/sw.js').catch(console.error);
+            }
+            
+            // 添加到主屏幕提示
+            let deferredPrompt;
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                deferredPrompt = e;
+                showToast('可将此应用添加到主屏幕以便快速访问', 'info');
+            });
+            
+            // 添加页面可见性变化监听
+            document.addEventListener('visibilitychange', function() {
+                if (!document.hidden) {
+                    // 页面重新可见时，重新从localStorage加载数据
+                    loadFromLocalStorage();
                     updatePendingOrdersDisplay();
                     updateBossStatistics();
-                    showToast('所有订单已清除', 'success');
                 }
             });
             
-            // 导出数据
-            document.getElementById('export-btn').addEventListener('click', function() {
-                if (pendingOrders.length === 0) {
-                    showToast('没有订单可导出', 'info');
-                    return;
-                }
-                
-                const csv = convertOrdersToCSV();
-                const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
-                const url = URL.createObjectURL(blob);
-                const link = document.createElement('a');
-                link.href = url;
-                link.download = `枫枫电竞订单_${new Date().toLocaleDateString('zh-CN').replace(/\//g, '-')}.csv`;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                
-                showToast('订单数据已导出为CSV文件', 'success');
+            // 添加beforeunload事件，确保离开页面时保存数据
+            window.addEventListener('beforeunload', function() {
+                saveToLocalStorage();
             });
-            
-            function convertOrdersToCSV() {
-                let csv = '订单ID,陪玩名称,老板名称,开始时间,结束时间,单价,状态,创建时间,计费时长,总费用\n';
-                
-                pendingOrders.forEach(order => {
-                    const timeResult = calculateTimeDifference(order.startTime, order.endTime);
-                    const totalCost = order.pricePerHour > 0 && !timeResult.error ? 
-                        (timeResult.billableHoursNum * order.pricePerHour).toFixed(2) : '0.00';
-                    
-                    csv += `"${order.id}","${order.companionName}","${order.bossName}","${formatDateTimeForDisplay(new Date(order.startTime))}",`;
-                    csv += `"${order.endTime ? formatDateTimeForDisplay(new Date(order.endTime)) : ''}","${order.pricePerHour}","${order.status}",`;
-                    csv += `"${formatDateTimeForDisplay(new Date(order.createdAt))}","${timeResult.billableHours}","${totalCost}"\n`;
-                });
-                
-                return csv;
-            }
-            
-            // 显示提示消息
-            function showToast(message, type = 'info') {
-                // 移除现有提示
-                const existingToast = document.querySelector('.toast');
-                if (existingToast) existingToast.remove();
-                
-                const toast = document.createElement('div');
-                toast.className = `toast toast-${type}`;
-                toast.textContent = message;
-                toast.style.cssText = `
-                    position: fixed;
-                    top: 20px;
-                    left: 50%;
-                    transform: translateX(-50%);
-                    background: ${type === 'success' ? 'rgba(64, 192, 87, 0.9)' : 
-                               type === 'error' ? 'rgba(255, 107, 107, 0.9)' : 
-                               type === 'warning' ? 'rgba(255, 204, 0, 0.9)' : 'rgba(77, 171, 247, 0.9)'};
-                    color: white;
-                    padding: 12px 24px;
-                    border-radius: 10px;
-                    z-index: 9999;
-                    font-weight: 500;
-                    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-                    animation: slideIn 0.3s ease;
-                `;
-                
-                document.body.appendChild(toast);
-                
-                setTimeout(() => {
-                    toast.style.animation = 'slideOut 0.3s ease';
-                    setTimeout(() => toast.remove(), 300);
-                }, 3000);
-            }
-            
-            // 添加CSS动画
-            const style = document.createElement('style');
-            style.textContent = `
-                @keyframes slideIn {
-                    from { top: -50px; opacity: 0; }
-                    to { top: 20px; opacity: 1; }
-                }
-                @keyframes slideOut {
-                    from { top: 20px; opacity: 1; }
-                    to { top: -50px; opacity: 0; }
-                }
-            `;
-            document.head.appendChild(style);
-            
-            // 防止键盘弹起时页面变形
-            window.addEventListener('resize', () => {
-                if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') {
-                    window.scrollTo(0, 0);
-                }
-            });
-            
-            // 初始化
-            function init() {
-                // 隐藏加载动画
-                setTimeout(() => {
-                    document.getElementById('loading').style.display = 'none';
-                }, 500);
-                
-                // 更新时间显示
-                updateCurrentTime();
-                setInterval(updateCurrentTime, 1000);
-                
-                // 从localStorage加载数据
-                loadFromLocalStorage();
-                
-                // 初始化时间输入（仅在表单为空时设置默认值）
-                initializeTimes();
-                
-                // 加载待结束订单
-                updatePendingOrdersDisplay();
-                
-                // 添加PWA支持
-                if ('serviceWorker' in navigator) {
-                    navigator.serviceWorker.register('/sw.js').catch(console.error);
-                }
-                
-                // 添加到主屏幕提示
-                let deferredPrompt;
-                window.addEventListener('beforeinstallprompt', (e) => {
-                    e.preventDefault();
-                    deferredPrompt = e;
-                    showToast('可将此应用添加到主屏幕以便快速访问', 'info');
-                });
-                
-                // 添加页面可见性变化监听
-                document.addEventListener('visibilitychange', function() {
-                    if (!document.hidden) {
-                        // 页面重新可见时，重新从localStorage加载数据
-                        loadFromLocalStorage();
-                        updatePendingOrdersDisplay();
-                        updateBossStatistics();
-                    }
-                });
-                
-                // 添加beforeunload事件，确保离开页面时保存数据
-                window.addEventListener('beforeunload', function() {
-                    saveToLocalStorage();
-                });
-            }
-            
-            // 页面加载完成后初始化
-            document.addEventListener('DOMContentLoaded', init);
-        </script>
+        }
+        
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
 </body>
 </html>

@@ -1669,7 +1669,7 @@
             const startMinutes = String(startDate.getMinutes()).padStart(2, '0');
             
             let copyText = `${month}/${day}\n`;
-            copyText += `开始时间：${startHours}：${startMinutes}   ${order.bossName}\n`;
+            copyText += `开始时间:${startHours}:${startMinutes}  ${order.bossName}\n`;
             
             if (isCompleted && order.endTime && !timeResult.error) {
                 const endDate = new Date(order.endTime);
@@ -1680,7 +1680,7 @@
                 const billableHours = timeResult.billableHoursNum;
                 const formattedHours = billableHours % 1 === 0 ? billableHours.toFixed(0) : billableHours.toFixed(1);
                 
-                copyText += `结束时间：${endHours}：${endMinutes}   ${formattedHours}h  ${order.pricePerHour}/h  已报备`;
+                copyText += `结束时间:${endHours}:${endMinutes} ${formattedHours}h ${order.pricePerHour}/h 已报备`;
             }
             
             return copyText;

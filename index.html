@@ -10,6 +10,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <style>
+        /* 原有的样式保持不变 */
         * {
             margin: 0;
             padding: 0;
@@ -1074,6 +1075,15 @@
         let selectedPrice = null;
         let editSelectedPrice = null;
         
+        // 辅助函数：精确计算金额
+        function calculateExactAmount(billableHours, pricePerHour) {
+            if (!billableHours || !pricePerHour) return 0;
+            
+            // 精确计算，避免浮点数问题
+            const rawCost = billableHours * pricePerHour;
+            return Math.round(rawCost * 100) / 100;
+        }
+        
         // 初始化：从localStorage加载数据
         function loadFromLocalStorage() {
             try {
@@ -1200,14 +1210,14 @@
             };
         }
         
-        // 计算订单费用
+        // 计算订单费用 - 修改为精确计算
         function calculateOrderCost(order) {
             const timeResult = calculateTimeDifference(order.startTime, order.endTime);
             if (timeResult.error) {
                 return 0;
             }
             
-            return timeResult.billableHoursNum * (order.pricePerHour || 0);
+            return calculateExactAmount(timeResult.billableHoursNum, (order.pricePerHour || 0));
         }
         
         // 显示老板详情
@@ -1227,7 +1237,13 @@
             const totalOrders = bossOrders.length;
             const completedOrders = bossOrders.filter(order => order.endTime).length;
             const pendingOrdersCount = totalOrders - completedOrders;
-            const totalCost = bossOrders.reduce((sum, order) => sum + calculateOrderCost(order), 0);
+            
+            // 精确计算总消费金额
+            let totalCost = 0;
+            bossOrders.forEach(order => {
+                totalCost += calculateOrderCost(order);
+            });
+            totalCost = Math.round(totalCost * 100) / 100;
             
             // 更新统计信息
             bossTotalOrdersEl.textContent = totalOrders;
@@ -1364,13 +1380,14 @@
             const bossStatsArray = Object.entries(bossStats)
                 .map(([name, stats]) => ({
                     name,
-                    total: stats.total,
+                    total: Math.round(stats.total * 100) / 100, // 精确计算
                     orderCount: stats.orderCount
                 }))
                 .sort((a, b) => b.total - a.total);
             
             // 计算所有老板的总消费
             const grandTotal = bossStatsArray.reduce((sum, boss) => sum + boss.total, 0);
+            const exactGrandTotal = Math.round(grandTotal * 100) / 100;
             
             // 创建统计卡片
             const statsCard = document.createElement('div');
@@ -1403,7 +1420,7 @@
                 statsHTML += `
                     <div class="boss-stat-item" style="border-bottom: none; margin-top: 10px; padding-top: 10px; border-top: 2px solid rgba(255, 255, 255, 0.2);">
                         <span class="boss-name" style="font-weight: bold;">总计</span>
-                        <span class="boss-total-amount">${grandTotal.toFixed(2)}元</span>
+                        <span class="boss-total-amount">${exactGrandTotal.toFixed(2)}元</span>
                     </div>
                 `;
             }
@@ -1454,7 +1471,7 @@
                 return;
             }
             
-            const totalCost = result.billableHoursNum * pricePerHour;
+            const totalCost = calculateExactAmount(result.billableHoursNum, pricePerHour);
             
             document.getElementById('cost-total').textContent = `${totalCost.toFixed(2)}元`;
             
@@ -1562,7 +1579,7 @@
                 billableText = timeResult.billableHours;
                 
                 if (order.pricePerHour > 0) {
-                    totalCost = timeResult.billableHoursNum * order.pricePerHour;
+                    totalCost = calculateExactAmount(timeResult.billableHoursNum, order.pricePerHour);
                     costText = `${totalCost.toFixed(2)}元`;
                 }
             } else if (!timeResult.error && !isCompleted) {
@@ -1572,7 +1589,7 @@
                 billableText = currentResult.billableHours;
                 
                 if (order.pricePerHour > 0) {
-                    totalCost = currentResult.billableHoursNum * order.pricePerHour;
+                    totalCost = calculateExactAmount(currentResult.billableHoursNum, order.pricePerHour);
                     costText = `${totalCost.toFixed(2)}元 (预估)`;
                 }
             }
@@ -1686,7 +1703,7 @@
             return copyText;
         }
         
-        // 生成新的格式化文本 - 已修改：金额保留两位小数
+        // 生成新的格式化文本 - 已修复：精确计算金额
         function generateFormatText(order, timeResult, totalCost) {
             const startDate = new Date(order.startTime);
             const year = startDate.getFullYear();
@@ -1698,8 +1715,14 @@
             // 获取老板名称，如果没有则使用"散客"
             const bossName = order.bossName && order.bossName !== '未填写' ? order.bossName : '散客';
             
-            // 计算总金额（如果未结束则计算预估金额） - 修改：保留两位小数
-            const amount = totalCost > 0 ? totalCost.toFixed(2) : '0.00';
+            // 精确计算金额
+            let amount = '0.00';
+            
+            if (order.pricePerHour > 0 && !timeResult.error) {
+                // 使用精确计算函数
+                const exactCost = calculateExactAmount(timeResult.billableHoursNum, order.pricePerHour);
+                amount = exactCost.toFixed(2);
+            }
             
             // 格式化接单时间
             const orderTime = `${year}-${month}-${day}-${hours}:${minutes}`;
@@ -2194,12 +2217,11 @@
             
             pendingOrders.forEach(order => {
                 const timeResult = calculateTimeDifference(order.startTime, order.endTime);
-                const totalCost = order.pricePerHour > 0 && !timeResult.error ? 
-                    (timeResult.billableHoursNum * order.pricePerHour).toFixed(2) : '0.00';
+                const totalCost = calculateOrderCost(order);
                 
                 csv += `"${order.id}","${order.companionName}","${order.bossName}","${formatDateTimeForDisplay(new Date(order.startTime))}",`;
                 csv += `"${order.endTime ? formatDateTimeForDisplay(new Date(order.endTime)) : ''}","${order.pricePerHour}","${order.status}",`;
-                csv += `"${formatDateTimeForDisplay(new Date(order.createdAt))}","${timeResult.billableHours}","${totalCost}"\n`;
+                csv += `"${formatDateTimeForDisplay(new Date(order.createdAt))}","${timeResult.billableHours}","${totalCost.toFixed(2)}"\n`;
             });
             
             return csv;

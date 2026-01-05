@@ -299,8 +299,88 @@
             color: var(--secondary-color);
         }
         
+        /* 新增：老板订单分组样式 */
+        .boss-group {
+            margin-bottom: 25px;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.2);
+        }
+        
+        .boss-group-header {
+            background: rgba(77, 171, 247, 0.2);
+            padding: 12px 15px;
+            border-bottom: 1px solid rgba(77, 171, 247, 0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .boss-group-header:hover {
+            background: rgba(77, 171, 247, 0.3);
+        }
+        
+        .boss-group-title {
+            font-weight: bold;
+            color: var(--secondary-color);
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .boss-group-count {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: var(--text-light);
+        }
+        
+        /* 新增：老板分组操作按钮 */
+        .boss-group-actions {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+        
+        .boss-group-delete-btn {
+            background: rgba(255, 107, 107, 0.3);
+            border: 1px solid #ff6b6b;
+            color: #ff6b6b;
+            padding: 6px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.2s;
+        }
+        
+        .boss-group-delete-btn:hover {
+            background: rgba(255, 107, 107, 0.5);
+        }
+        
+        .boss-group-orders {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease-out;
+        }
+        
+        .boss-group.expanded .boss-group-orders {
+            max-height: 2000px; /* 足够大的值确保展开 */
+        }
+        
+        .boss-group.expanded .boss-group-header {
+            background: rgba(77, 171, 247, 0.3);
+        }
+        
         .pending-orders {
-            max-height: 50vh;
+            max-height: 60vh;
             overflow-y: auto;
             margin-top: 15px;
             -webkit-overflow-scrolling: touch;
@@ -310,7 +390,7 @@
             background: rgba(255, 255, 255, 0.05);
             border-radius: 10px;
             padding: 15px;
-            margin-bottom: 12px;
+            margin: 12px;
             border-left: 4px solid var(--warning-color);
         }
         
@@ -734,6 +814,17 @@
             .copy-buttons {
                 flex-direction: column;
             }
+            
+            /* 在小屏幕上调整老板分组按钮布局 */
+            .boss-group-actions {
+                flex-direction: column;
+                gap: 4px;
+            }
+            
+            .boss-group-delete-btn {
+                padding: 4px 8px;
+                font-size: 0.7rem;
+            }
         }
         
         @media (min-width: 768px) {
@@ -789,6 +880,15 @@
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
+        }
+        
+        /* 新增：折叠展开图标样式 */
+        .collapse-icon {
+            transition: transform 0.3s ease;
+        }
+        
+        .boss-group.expanded .collapse-icon {
+            transform: rotate(90deg);
         }
     </style>
 </head>
@@ -899,7 +999,7 @@
                 <div class="no-orders" id="no-orders">
                     <i class="fas fa-clipboard-list"></i>
                     <p>暂无待结束订单</p>
-                    <p style="font-size:0.85rem; margin-top:10px; color: rgba(255,255,255,0.6);">添加新的订单后，将在这里显示</p>
+                    <p style="font-size:0.85rem; margin-top:10px; color: rgba(255,255,255,0.6);">添加新的订单后，将在这里按老板分组显示</p>
                 </div>
             </div>
             
@@ -1350,6 +1450,115 @@
             return `${hours}:${minutes}`;
         }
         
+        // 更新待结束订单显示 - 已修改为按老板分组显示
+        function updatePendingOrdersDisplay() {
+            // 清空容器
+            pendingOrdersContainer.innerHTML = '';
+            
+            // 更新订单数量
+            const pendingCount = pendingOrders.filter(order => !order.endTime).length;
+            pendingCountEl.textContent = pendingCount > 0 ? `(${pendingCount})` : '';
+            
+            if (pendingOrders.length === 0) {
+                const noOrdersClone = noOrdersEl.cloneNode(true);
+                pendingOrdersContainer.appendChild(noOrdersClone);
+                return;
+            }
+            
+            // 按老板名称分组
+            const ordersByBoss = {};
+            
+            pendingOrders.forEach(order => {
+                const bossName = order.bossName || '散客';
+                if (!ordersByBoss[bossName]) {
+                    ordersByBoss[bossName] = [];
+                }
+                ordersByBoss[bossName].push(order);
+            });
+            
+            // 按老板名称排序
+            const bossNames = Object.keys(ordersByBoss).sort();
+            
+            // 为每个老板创建分组
+            bossNames.forEach(bossName => {
+                const bossOrders = ordersByBoss[bossName];
+                
+                // 创建老板分组容器
+                const bossGroup = document.createElement('div');
+                bossGroup.className = 'boss-group expanded'; // 默认展开
+                
+                // 统计该老板的订单数量
+                const totalOrders = bossOrders.length;
+                const pendingOrdersCount = bossOrders.filter(order => !order.endTime).length;
+                
+                // 创建分组标题
+                bossGroup.innerHTML = `
+                    <div class="boss-group-header">
+                        <div class="boss-group-title" onclick="event.stopPropagation();">
+                            <i class="fas fa-crown"></i> ${bossName}
+                            <span class="boss-group-count">${totalOrders}单 (${pendingOrdersCount}待结束)</span>
+                        </div>
+                        <div class="boss-group-actions" onclick="event.stopPropagation();">
+                            <button class="boss-group-delete-btn" onclick="deleteAllOrdersByBoss('${bossName.replace(/'/g, "\\'")}')">
+                                <i class="fas fa-trash-alt"></i> 删除所有
+                            </button>
+                            <div>
+                                <i class="fas fa-chevron-right collapse-icon"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="boss-group-orders">
+                        <!-- 订单将在这里动态添加 -->
+                    </div>
+                `;
+                
+                // 获取订单容器
+                const ordersContainer = bossGroup.querySelector('.boss-group-orders');
+                
+                // 按创建时间倒序排序该老板的订单
+                const sortedOrders = [...bossOrders].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                
+                // 为每个订单创建元素
+                sortedOrders.forEach(order => {
+                    const orderElement = createOrderElement(order);
+                    ordersContainer.appendChild(orderElement);
+                });
+                
+                // 添加点击事件来折叠/展开分组
+                const header = bossGroup.querySelector('.boss-group-header');
+                header.addEventListener('click', function(e) {
+                    // 如果点击的是删除按钮，不触发折叠/展开
+                    if (!e.target.closest('.boss-group-actions') && !e.target.closest('.boss-group-delete-btn')) {
+                        bossGroup.classList.toggle('expanded');
+                    }
+                });
+                
+                // 将老板分组添加到容器
+                pendingOrdersContainer.appendChild(bossGroup);
+            });
+        }
+        
+        // 删除某个老板的所有订单
+        window.deleteAllOrdersByBoss = function(bossName) {
+            const bossOrders = pendingOrders.filter(order => order.bossName === bossName);
+            
+            if (bossOrders.length === 0) {
+                showToast('该老板没有订单', 'info');
+                return;
+            }
+            
+            const completedCount = bossOrders.filter(order => order.endTime).length;
+            const pendingCount = bossOrders.filter(order => !order.endTime).length;
+            
+            if (confirm(`确定要删除老板"${bossName}"的所有订单吗？\n\n总计: ${bossOrders.length}单\n已完成: ${completedCount}单\n待结束: ${pendingCount}单\n\n此操作不可撤销！`)) {
+                pendingOrders = pendingOrders.filter(order => order.bossName !== bossName);
+                saveToLocalStorage();
+                updatePendingOrdersDisplay();
+                updateBossStatistics();
+                showToast(`已删除老板"${bossName}"的所有订单`, 'success');
+            }
+        };
+        
         // 更新老板消费统计
         function updateBossStatistics() {
             bossStatisticsContainer.innerHTML = '';
@@ -1533,30 +1742,6 @@
             selectedPrice = null;
             
             showToast('订单已添加到待结束列表！', 'success');
-        }
-        
-        // 更新待结束订单显示
-        function updatePendingOrdersDisplay() {
-            // 清空容器
-            pendingOrdersContainer.innerHTML = '';
-            
-            // 更新订单数量
-            const pendingCount = pendingOrders.filter(order => !order.endTime).length;
-            pendingCountEl.textContent = pendingCount > 0 ? `(${pendingCount})` : '';
-            
-            if (pendingOrders.length === 0) {
-                const noOrdersClone = noOrdersEl.cloneNode(true);
-                pendingOrdersContainer.appendChild(noOrdersClone);
-                return;
-            }
-            
-            // 按创建时间倒序排序
-            const sortedOrders = [...pendingOrders].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-            
-            sortedOrders.forEach(order => {
-                const orderElement = createOrderElement(order);
-                pendingOrdersContainer.appendChild(orderElement);
-            });
         }
         
         // 创建订单元素

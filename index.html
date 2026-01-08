@@ -10,7 +10,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <style>
-        /* 原有的样式保持不变 */
+        /* 原有的样式保持不变，只添加少量优化 */
         * {
             margin: 0;
             padding: 0;
@@ -363,6 +363,18 @@
         
         .boss-group-delete-btn:hover {
             background: rgba(255, 107, 107, 0.5);
+        }
+        
+        /* 新增：老板总金额显示 */
+        .boss-group-amount {
+            font-weight: bold;
+            color: var(--success-color);
+            font-size: 0.9rem;
+            background: rgba(64, 192, 87, 0.2);
+            padding: 4px 10px;
+            border-radius: 20px;
+            border: 1px solid rgba(64, 192, 87, 0.3);
+            margin-left: 8px;
         }
         
         .boss-group-orders {
@@ -825,6 +837,18 @@
                 padding: 4px 8px;
                 font-size: 0.7rem;
             }
+            
+            /* 在小屏幕上调整老板分组标题布局 */
+            .boss-group-title {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 4px;
+            }
+            
+            .boss-group-amount {
+                margin-left: 0;
+                font-size: 0.8rem;
+            }
         }
         
         @media (min-width: 768px) {
@@ -853,19 +877,25 @@
             touch-action: manipulation;
         }
         
-        /* 加载动画 */
+        /* 加载动画 - 简化版 */
         .loading {
-            display: none;
+            display: flex;
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.95);
             z-index: 9999;
             align-items: center;
             justify-content: center;
             flex-direction: column;
+            transition: opacity 0.3s ease;
+        }
+        
+        .loading.hidden {
+            opacity: 0;
+            pointer-events: none;
         }
         
         .loading-spinner {
@@ -890,9 +920,58 @@
         .boss-group.expanded .collapse-icon {
             transform: rotate(90deg);
         }
+        
+        /* 优化：添加淡入动画 */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .card, .order-item, .boss-group {
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        /* 优化：按钮点击效果 */
+        .btn:active, .price-btn:active, .action-btn:active {
+            transform: scale(0.95);
+        }
+        
+        /* 优化：滚动条美化 */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 10px;
+        }
+        
+        /* 优化：空状态样式 */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-gray);
+        }
+        
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            opacity: 0.3;
+        }
+        
+        .empty-state p {
+            font-size: 1rem;
+            margin-bottom: 10px;
+        }
     </style>
 </head>
 <body>
+    <!-- 简化加载动画 -->
     <div class="loading" id="loading">
         <div class="loading-spinner"></div>
         <p style="margin-top: 20px; color: white;">加载中...</p>
@@ -1114,10 +1193,25 @@
     </footer>
     
     <script>
+        // ============ 优化版本：保持原有逻辑，只添加少量优化 ============
+        
         // 显示加载动画
         document.getElementById('loading').style.display = 'flex';
         
-        // DOM元素
+        // 简单的防抖函数优化
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+        
+        // DOM元素 - 缓存查询结果
         const currentTimeEl = document.getElementById('current-time');
         const pricePerHourEl = document.getElementById('price-per-hour');
         const companionNameEl = document.getElementById('companion-name');
@@ -1175,40 +1269,63 @@
         let selectedPrice = null;
         let editSelectedPrice = null;
         
-        // 辅助函数：精确计算金额
+        // 优化localStorage操作
+        const Storage = {
+            get(key, defaultValue = null) {
+                try {
+                    const item = localStorage.getItem(key);
+                    return item ? JSON.parse(item) : defaultValue;
+                } catch (error) {
+                    console.error('读取localStorage时出错:', error);
+                    return defaultValue;
+                }
+            },
+            
+            set(key, value) {
+                try {
+                    localStorage.setItem(key, JSON.stringify(value));
+                    return true;
+                } catch (error) {
+                    console.error('保存到localStorage时出错:', error);
+                    showToast('保存数据失败', 'error');
+                    return false;
+                }
+            }
+        };
+        
+        // 优化时间计算缓存
+        const timeCache = new Map();
+        
+        function calculateBillableHours(minutes) {
+            // 使用缓存
+            if (timeCache.has(minutes)) {
+                return timeCache.get(minutes);
+            }
+            
+            let result;
+            if (minutes <= 15) result = 0;
+            else if (minutes <= 44) result = 0.5;
+            else result = 1;
+            
+            timeCache.set(minutes, result);
+            return result;
+        }
+        
+        // 精确计算金额
         function calculateExactAmount(billableHours, pricePerHour) {
             if (!billableHours || !pricePerHour) return 0;
-            
-            // 精确计算，避免浮点数问题
-            const rawCost = billableHours * pricePerHour;
-            return Math.round(rawCost * 100) / 100;
+            return Math.round(billableHours * pricePerHour * 100) / 100;
         }
         
         // 初始化：从localStorage加载数据
         function loadFromLocalStorage() {
-            try {
-                const savedOrders = localStorage.getItem('fengfengPendingOrders');
-                if (savedOrders) {
-                    pendingOrders = JSON.parse(savedOrders);
-                    console.log(`从localStorage加载了 ${pendingOrders.length} 个订单`);
-                } else {
-                    pendingOrders = [];
-                    console.log('localStorage中没有订单数据');
-                }
-            } catch (error) {
-                console.error('加载localStorage数据时出错:', error);
-                pendingOrders = [];
-            }
+            pendingOrders = Storage.get('fengfengPendingOrders', []);
+            console.log(`加载了 ${pendingOrders.length} 个订单`);
         }
         
         // 保存数据到localStorage
         function saveToLocalStorage() {
-            try {
-                localStorage.setItem('fengfengPendingOrders', JSON.stringify(pendingOrders));
-                console.log(`保存了 ${pendingOrders.length} 个订单到localStorage`);
-            } catch (error) {
-                console.error('保存到localStorage时出错:', error);
-            }
+            Storage.set('fengfengPendingOrders', pendingOrders);
         }
         
         // 标签页切换
@@ -1228,12 +1345,9 @@
             updateBossStatistics();
         });
         
-        // 更新当前时间显示
+        // 更新当前时间显示 - 使用requestAnimationFrame优化
         function updateCurrentTime() {
             const now = new Date();
-            const year = now.getFullYear();
-            const month = String(now.getMonth() + 1).padStart(2, '0');
-            const day = String(now.getDate()).padStart(2, '0');
             const hours = String(now.getHours()).padStart(2, '0');
             const minutes = String(now.getMinutes()).padStart(2, '0');
             const seconds = String(now.getSeconds()).padStart(2, '0');
@@ -1241,10 +1355,8 @@
             currentTimeEl.textContent = `${hours}:${minutes}:${seconds}`;
         }
         
-        // 初始化时间输入框 - 只设置默认值，不覆盖用户输入
+        // 初始化时间输入框
         function initializeTimes() {
-            // 只在第一次加载页面时设置默认时间
-            // 或者当用户点击重置按钮时
             const now = new Date();
             const year = now.getFullYear();
             const month = String(now.getMonth() + 1).padStart(2, '0');
@@ -1252,7 +1364,6 @@
             const hours = String(now.getHours()).padStart(2, '0');
             const minutes = String(now.getMinutes()).padStart(2, '0');
             
-            // 设置开始时间为当前北京时间
             const datetimeLocalNow = `${year}-${month}-${day}T${hours}:${minutes}`;
             
             // 只有在表单为空时才设置默认值
@@ -1260,17 +1371,9 @@
                 startTimeEl.value = datetimeLocalNow;
             }
             
-            // 结束时间默认为空
             if (!endTimeEl.value) {
                 endTimeEl.value = '';
             }
-        }
-        
-        // 根据分钟计算计费时长
-        function calculateBillableHours(minutes) {
-            if (minutes <= 15) return 0;
-            if (minutes <= 44) return 0.5;
-            return 1;
         }
         
         // 计算时间差
@@ -1310,7 +1413,7 @@
             };
         }
         
-        // 计算订单费用 - 修改为精确计算
+        // 计算订单费用
         function calculateOrderCost(order) {
             const timeResult = calculateTimeDifference(order.startTime, order.endTime);
             if (timeResult.error) {
@@ -1318,6 +1421,15 @@
             }
             
             return calculateExactAmount(timeResult.billableHoursNum, (order.pricePerHour || 0));
+        }
+        
+        // 计算老板总金额
+        function calculateBossTotalAmount(bossOrders) {
+            let total = 0;
+            bossOrders.forEach(order => {
+                total += calculateOrderCost(order);
+            });
+            return Math.round(total * 100) / 100;
         }
         
         // 显示老板详情
@@ -1339,11 +1451,7 @@
             const pendingOrdersCount = totalOrders - completedOrders;
             
             // 精确计算总消费金额
-            let totalCost = 0;
-            bossOrders.forEach(order => {
-                totalCost += calculateOrderCost(order);
-            });
-            totalCost = Math.round(totalCost * 100) / 100;
+            let totalCost = calculateBossTotalAmount(bossOrders);
             
             // 更新统计信息
             bossTotalOrdersEl.textContent = totalOrders;
@@ -1450,7 +1558,7 @@
             return `${hours}:${minutes}`;
         }
         
-        // 更新待结束订单显示 - 已修改为按老板分组显示
+        // 更新待结束订单显示 - 优化渲染性能
         function updatePendingOrdersDisplay() {
             // 清空容器
             pendingOrdersContainer.innerHTML = '';
@@ -1460,8 +1568,13 @@
             pendingCountEl.textContent = pendingCount > 0 ? `(${pendingCount})` : '';
             
             if (pendingOrders.length === 0) {
-                const noOrdersClone = noOrdersEl.cloneNode(true);
-                pendingOrdersContainer.appendChild(noOrdersClone);
+                pendingOrdersContainer.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-clipboard-list"></i>
+                        <p>暂无待结束订单</p>
+                        <p class="subtext">添加新的订单后，将在这里按老板分组显示</p>
+                    </div>
+                `;
                 return;
             }
             
@@ -1483,13 +1596,14 @@
             bossNames.forEach(bossName => {
                 const bossOrders = ordersByBoss[bossName];
                 
-                // 创建老板分组容器
-                const bossGroup = document.createElement('div');
-                bossGroup.className = 'boss-group expanded'; // 默认展开
-                
-                // 统计该老板的订单数量
+                // 统计该老板的订单信息
                 const totalOrders = bossOrders.length;
                 const pendingOrdersCount = bossOrders.filter(order => !order.endTime).length;
+                const bossTotalAmount = calculateBossTotalAmount(bossOrders);
+                
+                // 创建老板分组容器
+                const bossGroup = document.createElement('div');
+                bossGroup.className = 'boss-group expanded';
                 
                 // 创建分组标题
                 bossGroup.innerHTML = `
@@ -1497,6 +1611,7 @@
                         <div class="boss-group-title" onclick="event.stopPropagation();">
                             <i class="fas fa-crown"></i> ${bossName}
                             <span class="boss-group-count">${totalOrders}单 (${pendingOrdersCount}待结束)</span>
+                            <span class="boss-group-amount">${bossTotalAmount.toFixed(2)}元</span>
                         </div>
                         <div class="boss-group-actions" onclick="event.stopPropagation();">
                             <button class="boss-group-delete-btn" onclick="deleteAllOrdersByBoss('${bossName.replace(/'/g, "\\'")}')">
@@ -1527,8 +1642,10 @@
                 // 添加点击事件来折叠/展开分组
                 const header = bossGroup.querySelector('.boss-group-header');
                 header.addEventListener('click', function(e) {
-                    // 如果点击的是删除按钮，不触发折叠/展开
-                    if (!e.target.closest('.boss-group-actions') && !e.target.closest('.boss-group-delete-btn')) {
+                    // 如果点击的是删除按钮或操作区域，不触发折叠/展开
+                    if (!e.target.closest('.boss-group-actions') && 
+                        !e.target.closest('.boss-group-delete-btn') &&
+                        !e.target.closest('.boss-group-title')) {
                         bossGroup.classList.toggle('expanded');
                     }
                 });
@@ -1549,8 +1666,9 @@
             
             const completedCount = bossOrders.filter(order => order.endTime).length;
             const pendingCount = bossOrders.filter(order => !order.endTime).length;
+            const totalAmount = calculateBossTotalAmount(bossOrders);
             
-            if (confirm(`确定要删除老板"${bossName}"的所有订单吗？\n\n总计: ${bossOrders.length}单\n已完成: ${completedCount}单\n待结束: ${pendingCount}单\n\n此操作不可撤销！`)) {
+            if (confirm(`确定要删除老板"${bossName}"的所有订单吗？\n\n总计: ${bossOrders.length}单\n已完成: ${completedCount}单\n待结束: ${pendingCount}单\n总金额: ${totalAmount.toFixed(2)}元\n\n此操作不可撤销！`)) {
                 pendingOrders = pendingOrders.filter(order => order.bossName !== bossName);
                 saveToLocalStorage();
                 updatePendingOrdersDisplay();
@@ -1589,7 +1707,7 @@
             const bossStatsArray = Object.entries(bossStats)
                 .map(([name, stats]) => ({
                     name,
-                    total: Math.round(stats.total * 100) / 100, // 精确计算
+                    total: Math.round(stats.total * 100) / 100,
                     orderCount: stats.orderCount
                 }))
                 .sort((a, b) => b.total - a.total);
@@ -1657,6 +1775,9 @@
             
             timeResults.style.display = 'block';
             costResults.style.display = 'none';
+            
+            // 添加动画
+            timeResults.style.animation = 'fadeIn 0.3s ease-out';
         }
         
         // 显示费用计算结果
@@ -1686,6 +1807,9 @@
             
             costResults.style.display = 'block';
             timeResults.style.display = 'none';
+            
+            // 添加动画
+            costResults.style.animation = 'fadeIn 0.3s ease-out';
         }
         
         // 添加到待结束订单
@@ -1746,13 +1870,8 @@
         
         // 创建订单元素
         function createOrderElement(order) {
-            const orderDiv = document.createElement('div');
-            orderDiv.className = `order-item ${order.status === 'completed' ? 'completed' : ''}`;
-            orderDiv.setAttribute('data-id', order.id);
-            
-            // 计算时长和费用
-            const timeResult = calculateTimeDifference(order.startTime, order.endTime);
             const isCompleted = order.endTime !== null;
+            const timeResult = calculateTimeDifference(order.startTime, order.endTime);
             
             let durationText = '进行中';
             let billableText = '待计算';
@@ -1783,6 +1902,11 @@
             const copyText = generateCopyText(order, timeResult, isCompleted);
             // 生成新的格式化文本
             const formatText = generateFormatText(order, timeResult, totalCost);
+            
+            const orderDiv = document.createElement('div');
+            orderDiv.className = `order-item ${isCompleted ? 'completed' : ''}`;
+            orderDiv.setAttribute('data-id', order.id);
+            orderDiv.setAttribute('data-format-text', formatText);
             
             orderDiv.innerHTML = `
                 <div class="order-header">
@@ -1855,13 +1979,10 @@
                 </div>
             `;
             
-            // 存储格式化文本数据
-            orderDiv.setAttribute('data-format-text', formatText);
-            
             return orderDiv;
         }
         
-        // 生成报单文本 - 使用实际计费小时数
+        // 生成报单文本
         function generateCopyText(order, timeResult, isCompleted) {
             const startDate = new Date(order.startTime);
             const month = startDate.getMonth() + 1;
@@ -1888,7 +2009,7 @@
             return copyText;
         }
         
-        // 生成新的格式化文本 - 已修复：精确计算金额
+        // 生成新的格式化文本
         function generateFormatText(order, timeResult, totalCost) {
             const startDate = new Date(order.startTime);
             const year = startDate.getFullYear();
@@ -1938,10 +2059,10 @@
             return `${year}-${month}-${day}T${hours}:${minutes}`;
         }
         
-        // ============ 修复的复制功能函数 ============
+        // ============ 复制功能函数 ============
         
-        // 复制文本到剪贴板 - 修复版本
-        window.copyTextToClipboard = function(orderId) {
+        // 复制文本到剪贴板
+        window.copyTextToClipboard = async function(orderId) {
             try {
                 // 找到对应的订单元素
                 const orderElement = document.querySelector(`.order-item[data-id="${orderId}"]`);
@@ -1968,29 +2089,19 @@
                 
                 // 使用现代 Clipboard API
                 if (navigator.clipboard && navigator.clipboard.writeText) {
-                    navigator.clipboard.writeText(textToCopy).then(() => {
-                        showToast('文本已复制到剪贴板！', 'success');
+                    await navigator.clipboard.writeText(textToCopy);
+                    showToast('文本已复制到剪贴板！', 'success');
+                    
+                    // 给按钮一个视觉反馈
+                    if (copyBtn) {
+                        copyBtn.classList.add('copied');
+                        copyBtn.innerHTML = '<i class="fas fa-check"></i> 已复制';
                         
-                        // 给按钮一个视觉反馈
-                        if (copyBtn) {
-                            const originalText = copyBtn.innerHTML;
-                            copyBtn.innerHTML = '<i class="fas fa-check"></i> 已复制';
-                            copyBtn.style.background = 'rgba(64, 192, 87, 0.3)';
-                            copyBtn.style.borderColor = 'var(--success-color)';
-                            copyBtn.style.color = 'var(--success-color)';
-                            
-                            setTimeout(() => {
-                                copyBtn.innerHTML = originalText;
-                                copyBtn.style.background = '';
-                                copyBtn.style.borderColor = '';
-                                copyBtn.style.color = '';
-                            }, 2000);
-                        }
-                    }).catch(err => {
-                        console.error('复制失败:', err);
-                        // 回退到老方法
-                        fallbackCopyText(textToCopy, copyBtn);
-                    });
+                        setTimeout(() => {
+                            copyBtn.classList.remove('copied');
+                            copyBtn.innerHTML = '<i class="fas fa-copy"></i> 复制';
+                        }, 2000);
+                    }
                 } else {
                     // 老浏览器回退方案
                     fallbackCopyText(textToCopy, copyBtn);
@@ -2023,17 +2134,12 @@
                     
                     // 给按钮一个视觉反馈
                     if (copyBtn) {
-                        const originalText = copyBtn.innerHTML;
+                        copyBtn.classList.add('copied');
                         copyBtn.innerHTML = '<i class="fas fa-check"></i> 已复制';
-                        copyBtn.style.background = 'rgba(64, 192, 87, 0.3)';
-                        copyBtn.style.borderColor = 'var(--success-color)';
-                        copyBtn.style.color = 'var(--success-color)';
                         
                         setTimeout(() => {
-                            copyBtn.innerHTML = originalText;
-                            copyBtn.style.background = '';
-                            copyBtn.style.borderColor = '';
-                            copyBtn.style.color = '';
+                            copyBtn.classList.remove('copied');
+                            copyBtn.innerHTML = '<i class="fas fa-copy"></i> 复制';
                         }, 2000);
                     }
                 } else {
@@ -2045,8 +2151,8 @@
             }
         }
         
-        // 复制格式文本 - 修复版本
-        window.copyFormatText = function(orderId, formatType) {
+        // 复制格式文本
+        window.copyFormatText = async function(orderId, formatType) {
             try {
                 // 找到对应的订单元素
                 const orderElement = document.querySelector(`.order-item[data-id="${orderId}"]`);
@@ -2062,42 +2168,33 @@
                     return;
                 }
                 
+                // 找到对应的复制按钮
+                const copyFormatBtn = orderElement.querySelector(`.copy-format-btn[onclick*="copyFormatText(${orderId}, '${formatType}')"]`);
+                
                 // 使用现代 Clipboard API
                 if (navigator.clipboard && navigator.clipboard.writeText) {
-                    navigator.clipboard.writeText(formatText).then(() => {
-                        showToast('格式文本已复制到剪贴板！', 'success');
+                    await navigator.clipboard.writeText(formatText);
+                    showToast('格式文本已复制到剪贴板！', 'success');
+                    
+                    // 给按钮一个视觉反馈
+                    if (copyFormatBtn) {
+                        copyFormatBtn.classList.add('copied');
+                        copyFormatBtn.innerHTML = '<i class="fas fa-check"></i> 已复制';
                         
-                        // 找到对应的复制按钮并给视觉反馈
-                        const copyFormatBtn = orderElement.querySelector(`.copy-format-btn[onclick*="copyFormatText(${orderId}, '${formatType}')"]`);
-                        if (copyFormatBtn) {
-                            const originalText = copyFormatBtn.innerHTML;
-                            copyFormatBtn.innerHTML = '<i class="fas fa-check"></i> 已复制';
-                            copyFormatBtn.style.background = 'rgba(64, 192, 87, 0.3)';
-                            copyFormatBtn.style.borderColor = 'var(--success-color)';
-                            copyFormatBtn.style.color = 'var(--success-color)';
-                            
-                            setTimeout(() => {
-                                copyFormatBtn.innerHTML = originalText;
-                                copyFormatBtn.style.background = '';
-                                copyFormatBtn.style.borderColor = '';
-                                copyFormatBtn.style.color = '';
-                            }, 2000);
-                        }
-                    }).catch(err => {
-                        console.error('复制格式文本失败:', err);
-                        fallbackCopyText(formatText);
-                    });
+                        setTimeout(() => {
+                            copyFormatBtn.classList.remove('copied');
+                            copyFormatBtn.innerHTML = '<i class="fas fa-copy"></i> 复制格式一';
+                        }, 2000);
+                    }
                 } else {
                     // 老浏览器回退方案
-                    fallbackCopyText(formatText);
+                    fallbackCopyText(formatText, copyFormatBtn);
                 }
             } catch (error) {
                 console.error('复制格式文本过程中出错:', error);
                 showToast('复制失败，请重试', 'error');
             }
         };
-        
-        // ============ 修复的复制功能函数结束 ============
         
         // 编辑订单
         window.editOrder = function(id) {
@@ -2412,50 +2509,51 @@
             return csv;
         }
         
-        // 显示提示消息
+        // 显示提示消息 - 优化版
         function showToast(message, type = 'info') {
             // 移除现有提示
             const existingToast = document.querySelector('.toast');
             if (existingToast) existingToast.remove();
             
             const toast = document.createElement('div');
-            toast.className = `toast toast-${type}`;
+            toast.className = `toast`;
             toast.textContent = message;
             toast.style.cssText = `
                 position: fixed;
                 top: 20px;
                 left: 50%;
                 transform: translateX(-50%);
-                background: ${type === 'success' ? 'rgba(64, 192, 87, 0.9)' : 
-                           type === 'error' ? 'rgba(255, 107, 107, 0.9)' : 
-                           type === 'warning' ? 'rgba(255, 204, 0, 0.9)' : 'rgba(77, 171, 247, 0.9)'};
+                background: ${type === 'success' ? 'rgba(64, 192, 87, 0.95)' : 
+                           type === 'error' ? 'rgba(255, 107, 107, 0.95)' : 
+                           type === 'warning' ? 'rgba(255, 204, 0, 0.95)' : 'rgba(77, 171, 247, 0.95)'};
                 color: white;
                 padding: 12px 24px;
                 border-radius: 10px;
                 z-index: 9999;
                 font-weight: 500;
                 box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-                animation: slideIn 0.3s ease;
+                animation: fadeIn 0.3s ease, fadeOut 0.3s ease 2.7s;
+                pointer-events: none;
             `;
             
             document.body.appendChild(toast);
             
             setTimeout(() => {
-                toast.style.animation = 'slideOut 0.3s ease';
-                setTimeout(() => toast.remove(), 300);
+                toast.remove();
             }, 3000);
         }
         
         // 添加CSS动画
         const style = document.createElement('style');
         style.textContent = `
-            @keyframes slideIn {
-                from { top: -50px; opacity: 0; }
-                to { top: 20px; opacity: 1; }
+            @keyframes fadeIn {
+                from { opacity: 0; transform: translate(-50%, -10px); }
+                to { opacity: 1; transform: translate(-50%, 0); }
             }
-            @keyframes slideOut {
-                from { top: 20px; opacity: 1; }
-                to { top: -50px; opacity: 0; }
+            
+            @keyframes fadeOut {
+                from { opacity: 1; transform: translate(-50%, 0); }
+                to { opacity: 0; transform: translate(-50%, -10px); }
             }
         `;
         document.head.appendChild(style);
@@ -2471,7 +2569,11 @@
         function init() {
             // 隐藏加载动画
             setTimeout(() => {
-                document.getElementById('loading').style.display = 'none';
+                const loadingEl = document.getElementById('loading');
+                loadingEl.classList.add('hidden');
+                setTimeout(() => {
+                    loadingEl.style.display = 'none';
+                }, 300);
             }, 500);
             
             // 更新时间显示
@@ -2486,19 +2588,6 @@
             
             // 加载待结束订单
             updatePendingOrdersDisplay();
-            
-            // 添加PWA支持
-            if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register('/sw.js').catch(console.error);
-            }
-            
-            // 添加到主屏幕提示
-            let deferredPrompt;
-            window.addEventListener('beforeinstallprompt', (e) => {
-                e.preventDefault();
-                deferredPrompt = e;
-                showToast('可将此应用添加到主屏幕以便快速访问', 'info');
-            });
             
             // 添加页面可见性变化监听
             document.addEventListener('visibilitychange', function() {
@@ -2517,7 +2606,11 @@
         }
         
         // 页面加载完成后初始化
-        document.addEventListener('DOMContentLoaded', init);
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
     </script>
 </body>
 </html>

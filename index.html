@@ -1526,6 +1526,28 @@
             });
         }
         
+        // 生成小程序文本
+        function generateMiniProgramText(order, timeResult, totalCost) {
+            const startDate = new Date(order.startTime);
+            const year = startDate.getFullYear();
+            const month = String(startDate.getMonth() + 1).padStart(2, '0');
+            const day = String(startDate.getDate()).padStart(2, '0');
+            const hours = String(startDate.getHours()).padStart(2, '0');
+            const minutes = String(startDate.getMinutes()).padStart(2, '0');
+            
+            let miniProgramText = '';
+            miniProgramText += '接单群：枫枫电竞派单群\n';
+            miniProgramText += `项目：PUBG-${order.pricePerHour || 0}\n`;
+            miniProgramText += `老板：${order.bossName || '散客'}\n`;
+            miniProgramText += '所属人：\n';
+            miniProgramText += '数量：1\n';
+            miniProgramText += `金额：${totalCost.toFixed(2)}\n`;
+            miniProgramText += '接待：xs\n';  // 固定为"xs"
+            miniProgramText += `接单时间：${year}-${month}-${day}-${hours}:${minutes}`;
+            
+            return miniProgramText;
+        }
+        
         // 创建订单元素
         function createOrderElement(order) {
             const isCompleted = order.endTime !== null;
@@ -1632,6 +1654,12 @@
                         <i class="fas fa-copy"></i> 复制报单文本
                     </button>
                 </div>
+                
+                <div class="copy-area" style="margin-top: 8px;">
+                    <button class="copy-btn" onclick="copyMiniProgramText(${order.id})">
+                        <i class="fas fa-mobile-alt"></i> 复制小程序文本
+                    </button>
+                </div>
             `;
             
             return orderDiv;
@@ -1717,6 +1745,51 @@
             }
         };
         
+        // 复制小程序文本
+        window.copyMiniProgramText = async function(orderId) {
+            try {
+                const orderIndex = pendingOrders.findIndex(order => order.id === orderId);
+                if (orderIndex === -1) {
+                    showToast('未找到订单', 'error');
+                    return;
+                }
+                
+                const order = pendingOrders[orderIndex];
+                const timeResult = calculateTimeDifference(order.startTime, order.endTime);
+                let totalCost = 0;
+                
+                if (!timeResult.error) {
+                    totalCost = calculateExactAmount(timeResult.billableHoursNum, order.pricePerHour || 0);
+                }
+                
+                // 生成小程序文本
+                const textToCopy = generateMiniProgramText(order, timeResult, totalCost);
+                
+                // 找到对应的复制按钮
+                const orderElement = document.querySelector(`.order-item[data-id="${orderId}"]`);
+                const copyBtn = orderElement ? orderElement.querySelectorAll('.copy-btn')[1] : null;
+                
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    await navigator.clipboard.writeText(textToCopy);
+                    if (copyBtn) {
+                        copyBtn.classList.add('copied');
+                        copyBtn.innerHTML = '<i class="fas fa-check"></i> 已复制';
+                        setTimeout(() => {
+                            copyBtn.classList.remove('copied');
+                            copyBtn.innerHTML = '<i class="fas fa-mobile-alt"></i> 复制小程序文本';
+                        }, 2000);
+                    }
+                    showToast('小程序文本已复制到剪贴板', 'success');
+                } else {
+                    // 备用复制方法
+                    fallbackCopyTextMiniProgram(textToCopy, copyBtn);
+                }
+            } catch (error) {
+                console.error('复制小程序文本失败:', error);
+                showToast('复制失败', 'error');
+            }
+        };
+        
         function fallbackCopyText(text, copyBtn) {
             const textArea = document.createElement('textarea');
             textArea.value = text;
@@ -1739,6 +1812,38 @@
                         copyBtn.innerHTML = '<i class="fas fa-copy"></i> 复制报单文本';
                     }, 2000);
                     showToast('已复制到剪贴板', 'success');
+                } else {
+                    showToast('复制失败，请手动选择文本复制', 'error');
+                }
+            } catch (error) {
+                showToast('复制失败', 'error');
+            }
+        }
+        
+        function fallbackCopyTextMiniProgram(text, copyBtn) {
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            textArea.style.position = 'fixed';
+            textArea.style.left = '-999999px';
+            textArea.style.top = '-999999px';
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            
+            try {
+                const successful = document.execCommand('copy');
+                document.body.removeChild(textArea);
+                
+                if (successful) {
+                    if (copyBtn) {
+                        copyBtn.classList.add('copied');
+                        copyBtn.innerHTML = '<i class="fas fa-check"></i> 已复制';
+                        setTimeout(() => {
+                            copyBtn.classList.remove('copied');
+                            copyBtn.innerHTML = '<i class="fas fa-mobile-alt"></i> 复制小程序文本';
+                        }, 2000);
+                    }
+                    showToast('小程序文本已复制到剪贴板', 'success');
                 } else {
                     showToast('复制失败，请手动选择文本复制', 'error');
                 }

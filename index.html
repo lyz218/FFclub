@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>枫枫电竞</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="apple-touch-icon" sizes="180x180" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎮</text></svg>">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎮</text></svg>">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <style>
         /* 精简高级风格 */
         * {
@@ -35,7 +39,7 @@
             padding: 12px;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
-            font-size: 14px;
+            font-size: 14px; /* 缩小整体字体 */
             line-height: 1.5;
         }
         
@@ -44,7 +48,7 @@
             margin: 0 auto;
         }
         
-        /* 头部 */
+        /* 精简的头部 */
         header {
             text-align: center;
             margin-bottom: 20px;
@@ -54,7 +58,7 @@
         
         h1 {
             color: var(--text-light);
-            font-size: 1.4rem;
+            font-size: 1.4rem; /* 缩小标题 */
             font-weight: 600;
             letter-spacing: -0.3px;
             margin-bottom: 4px;
@@ -71,7 +75,7 @@
         
         .subtitle {
             color: var(--text-gray);
-            font-size: 0.8rem;
+            font-size: 0.8rem; /* 缩小副标题 */
             opacity: 0.8;
         }
         
@@ -91,7 +95,7 @@
             font-weight: 600;
         }
         
-        /* 标签页 */
+        /* 优化的标签页 */
         .mobile-tabs {
             display: flex;
             background: rgba(255, 255, 255, 0.03);
@@ -134,7 +138,7 @@
             margin-left: 4px;
         }
         
-        /* 卡片设计 */
+        /* 精简的卡片设计 */
         .card {
             background: var(--bg-card);
             border-radius: 14px;
@@ -149,7 +153,7 @@
             display: flex;
             align-items: center;
             color: var(--secondary-color);
-            font-size: 1rem;
+            font-size: 1rem; /* 缩小标题 */
             margin-bottom: 16px;
             padding-bottom: 10px;
             border-bottom: 1px solid var(--border-color);
@@ -161,7 +165,7 @@
             font-size: 0.9rem;
         }
         
-        /* 表单控件 */
+        /* 精简的表单控件 */
         .input-group {
             margin-bottom: 14px;
         }
@@ -202,75 +206,28 @@
             appearance: none;
         }
         
-        /* 优化的时间输入布局 */
-        .time-input-wrapper {
-            position: relative;
-            margin-bottom: 5px;
+        /* 特别优化时间输入框 - 完全自定义解决方案 */
+        input[type="datetime-local"] {
+            font-size: 16px !important; /* 防止iOS Safari自动缩放 */
+            min-height: 50px !important; /* 增加高度 */
+            padding: 14px 16px !important; /* 增加内边距 */
+            line-height: 1.4 !important;
+            color-scheme: dark; /* 告诉浏览器这是深色主题输入 */
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+            letter-spacing: 0.3px;
         }
         
-        .time-input-group {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-            margin-bottom: 5px;
-        }
-        
-        .time-input-group input[type="datetime-local"] {
-            flex: 1;
-            min-width: 0;
-            font-size: 15px !important;
-            padding: 12px 14px !important;
-            min-height: 48px !important;
-            line-height: 1.4;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%238a8a9c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='18' rx='2' ry='2'%3E%3C/rect%3E%3Cline x1='16' y1='2' x2='16' y2='6'%3E%3C/line%3E%3Cline x1='8' y1='2' x2='8' y2='6'%3E%3C/line%3E%3Cline x1='3' y1='10' x2='21' y2='10'%3E%3C/line%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 14px center;
-            background-size: 20px;
-            padding-right: 45px !important;
-            border: 1px solid var(--border-color);
-            transition: all 0.2s;
-        }
-        
-        .time-input-group input[type="datetime-local"]:focus {
-            border-color: var(--secondary-color);
-            box-shadow: 0 0 0 2px rgba(77, 171, 247, 0.2);
+        input:focus, select:focus {
             outline: none;
-        }
-        
-        .time-btn-group {
-            display: flex;
-            gap: 8px;
-            margin-top: 8px;
-            flex-wrap: wrap;
-        }
-        
-        .time-btn-small {
-            padding: 8px 12px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            color: var(--text-gray);
-            font-size: 0.8rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 4px;
-            min-height: 36px;
-            flex: 1;
-            min-width: 0;
-        }
-        
-        .time-btn-small:hover, .time-btn-small:active {
-            background: rgba(77, 171, 247, 0.1);
             border-color: var(--secondary-color);
-            color: var(--secondary-color);
+            box-shadow: 0 0 0 2px rgba(77, 171, 247, 0.15);
+            background: rgba(77, 171, 247, 0.05);
         }
         
-        .time-btn-small i {
-            font-size: 0.8rem;
+        input[type="datetime-local"]:focus {
+            border-color: var(--secondary-color) !important;
+            box-shadow: 0 0 0 3px rgba(77, 171, 247, 0.25) !important;
+            outline: none !important;
         }
         
         /* 精简的价格按钮 */
@@ -307,7 +264,50 @@
             box-shadow: 0 2px 8px rgba(77, 171, 247, 0.2);
         }
         
-        /* 按钮设计 */
+        /* 重新设计时间输入组 - 解决iOS压缩问题 */
+        .time-input-group {
+            display: flex;
+            gap: 10px;
+            align-items: stretch; /* 改为stretch让元素等高 */
+            margin-bottom: 5px;
+        }
+        
+        .time-input-group input {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .time-input-group input[type="datetime-local"] {
+            flex: 1;
+            min-width: 0;
+            font-size: 17px !important; /* iOS推荐字体大小 */
+            padding: 15px 18px !important; /* 更大的内边距 */
+            min-height: 52px !important;
+            line-height: 1.4;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%238a8a9c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='18' rx='2' ry='2'%3E%3C/rect%3E%3Cline x1='16' y1='2' x2='16' y2='6'%3E%3C/line%3E%3Cline x1='8' y1='2' x2='8' y2='6'%3E%3C/line%3E%3Cline x1='3' y1='10' x2='21' y2='10'%3E%3C/line%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            background-size: 24px;
+            padding-right: 50px !important; /* 为右侧图标留出更多空间 */
+            -webkit-appearance: none;
+            appearance: none;
+            border: 2px solid var(--border-color);
+        }
+        
+        .time-input-group .btn-small {
+            min-width: 80px !important; /* 增大按钮宽度 */
+            padding: 14px 12px !important;
+            font-size: 0.9rem !important;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid var(--border-color);
+            height: auto; /* 让按钮高度自适应 */
+            align-self: stretch; /* 确保按钮和时间输入框等高 */
+        }
+        
+        /* 精简的按钮设计 */
         .btn {
             padding: 11px 16px;
             border: none;
@@ -353,6 +353,12 @@
             box-shadow: 0 4px 12px rgba(77, 171, 247, 0.3);
         }
         
+        .btn-small {
+            padding: 8px 12px;
+            font-size: 0.8rem;
+            min-height: 36px;
+        }
+        
         .button-group {
             display: flex;
             flex-direction: column;
@@ -392,46 +398,388 @@
             color: var(--secondary-color);
         }
         
+        /* 优化的待结束页面布局 - 取消老板分组，改为扁平列表 */
+        .pending-orders {
+            max-height: calc(100vh - 300px);
+            overflow-y: auto;
+            margin-top: 12px;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .order-filters {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-btn {
+            padding: 6px 12px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            color: var(--text-gray);
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .filter-btn.active {
+            background: rgba(77, 171, 247, 0.15);
+            border-color: var(--secondary-color);
+            color: var(--secondary-color);
+        }
+        
+        .order-item {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 14px;
+            margin-bottom: 12px;
+            border: 1px solid var(--border-color);
+            border-left: 3px solid var(--warning-color);
+            transition: all 0.2s;
+        }
+        
+        .order-item.completed {
+            border-left-color: var(--success-color);
+            opacity: 0.9;
+        }
+        
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+        
+        .order-title {
+            font-weight: 600;
+            color: var(--warning-color);
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .order-item.completed .order-title {
+            color: var(--success-color);
+        }
+        
+        .order-status {
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        
+        .status-pending {
+            background-color: rgba(255, 204, 0, 0.15);
+            color: var(--warning-color);
+            border: 1px solid rgba(255, 204, 0, 0.2);
+        }
+        
+        .status-completed {
+            background-color: rgba(64, 192, 87, 0.15);
+            color: var(--success-color);
+            border: 1px solid rgba(64, 192, 87, 0.2);
+        }
+        
+        /* 简化的订单详情布局 */
+        .order-info {
+            margin-bottom: 12px;
+        }
+        
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 0.85rem;
+        }
+        
+        .info-label {
+            color: var(--text-gray);
+            min-width: 60px;
+        }
+        
+        .info-value {
+            color: var(--text-light);
+            font-weight: 500;
+            text-align: right;
+            flex: 1;
+        }
+        
+        /* 精简的操作按钮 */
+        .order-actions {
+            display: flex;
+            gap: 6px;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+        
+        .action-btn {
+            padding: 6px 10px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            flex: 1;
+            min-width: 0;
+            justify-content: center;
+        }
+        
+        .edit-btn {
+            background-color: rgba(77, 171, 247, 0.15);
+            color: var(--secondary-color);
+            border: 1px solid rgba(77, 171, 247, 0.2);
+        }
+        
+        .complete-btn {
+            background-color: rgba(64, 192, 87, 0.15);
+            color: var(--success-color);
+            border: 1px solid rgba(64, 192, 87, 0.2);
+        }
+        
+        .delete-btn {
+            background-color: rgba(255, 107, 107, 0.15);
+            color: #ff6b6b;
+            border: 1px solid rgba(255, 107, 107, 0.2);
+        }
+        
+        /* 复制区域优化 */
+        .copy-area {
+            margin-top: 12px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            position: relative;
+        }
+        
+        .copy-text {
+            font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+            font-size: 0.8rem;
+            line-height: 1.4;
+            white-space: pre-wrap;
+            color: var(--text-light);
+            margin-bottom: 8px;
+            user-select: text;
+            -webkit-user-select: text;
+            -moz-user-select: text;
+            -ms-user-select: text;
+        }
+        
+        .copy-btn {
+            width: 100%;
+            padding: 8px;
+            background: rgba(77, 171, 247, 0.1);
+            border: 1px solid var(--secondary-color);
+            color: var(--secondary-color);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+        
+        .copy-btn.copied {
+            background: rgba(64, 192, 87, 0.15);
+            border-color: var(--success-color);
+            color: var(--success-color);
+        }
+        
+        /* 老板统计优化 */
+        .boss-statistics {
+            margin-top: 20px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            padding: 16px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .boss-statistics h3 {
+            color: var(--warning-color);
+            margin-bottom: 12px;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .boss-stat-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            padding-bottom: 8px;
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.08);
+            font-size: 0.9rem;
+        }
+        
+        .boss-name {
+            color: var(--text-light);
+            cursor: pointer;
+            transition: color 0.2s;
+            font-weight: 500;
+        }
+        
+        .boss-name:hover {
+            color: var(--secondary-color);
+        }
+        
+        .boss-total {
+            font-weight: 600;
+            color: var(--success-color);
+        }
+        
+        .boss-total-amount {
+            font-weight: 700;
+            color: var(--primary-color);
+            font-size: 1rem;
+        }
+        
+        /* 空状态样式 */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-gray);
+        }
+        
+        .empty-state i {
+            font-size: 2.5rem;
+            margin-bottom: 12px;
+            opacity: 0.2;
+        }
+        
+        .empty-state p {
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+        }
+        
+        .empty-state .subtext {
+            font-size: 0.8rem;
+            opacity: 0.6;
+        }
+        
+        /* 底部 */
+        footer {
+            text-align: center;
+            margin-top: 25px;
+            color: var(--text-gray);
+            font-size: 0.75rem;
+            padding-top: 15px;
+            border-top: 1px solid var(--border-color);
+            opacity: 0.7;
+        }
+        
+        /* 模态框优化 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .modal.show {
+            display: flex;
+            opacity: 1;
+        }
+        
+        .modal-content {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 20px;
+            width: 100%;
+            max-height: 85vh;
+            overflow-y: auto;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            -webkit-overflow-scrolling: touch;
+            transform: translateY(20px);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+        
+        .modal.show .modal-content {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .modal-title {
+            color: var(--warning-color);
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            color: var(--text-gray);
+            font-size: 1.3rem;
+            cursor: pointer;
+            padding: 4px;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+        
+        .close-btn:hover {
+            opacity: 1;
+        }
+        
+        /* 模态框中的时间输入框 */
+        .modal-content input[type="datetime-local"] {
+            font-size: 17px !important;
+            min-height: 52px !important;
+            padding: 15px 18px !important;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%238a8a9c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='18' rx='2' ry='2'%3E%3C/rect%3E%3Cline x1='16' y1='2' x2='16' y2='6'%3E%3C/line%3E%3Cline x1='8' y1='2' x2='8' y2='6'%3E%3C/line%3E%3Cline x1='3' y1='10' x2='21' y2='10'%3E%3C/line%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            background-size: 24px;
+            padding-right: 50px !important;
+            border: 2px solid var(--border-color);
+        }
+        
         /* 响应式设计 */
         @media (max-width: 480px) {
             body {
                 padding: 10px;
             }
             
+            h1 {
+                font-size: 1.3rem;
+            }
+            
             .card {
                 padding: 16px;
             }
             
-            .time-input-group input[type="datetime-local"] {
-                font-size: 14px !important;
-                padding: 10px 12px !important;
-                min-height: 44px !important;
-                padding-right: 40px !important;
-            }
-            
-            .time-btn-small {
-                padding: 6px 10px;
-                font-size: 0.75rem;
-                min-height: 34px;
-            }
-            
             .price-buttons {
                 grid-template-columns: repeat(3, 1fr);
-            }
-        }
-        
-        /* 针对iPhone SE等小屏幕手机 */
-        @media (max-width: 375px) {
-            .time-input-group input[type="datetime-local"] {
-                font-size: 13px !important;
-                padding: 9px 11px !important;
-                min-height: 42px !important;
-            }
-            
-            .time-btn-small {
-                padding: 5px 8px;
-                font-size: 0.7rem;
-                min-height: 32px;
             }
             
             .btn {
@@ -439,27 +787,279 @@
                 font-size: 0.85rem;
                 min-height: 40px;
             }
+            
+            .button-group {
+                gap: 6px;
+            }
+            
+            .time-input-group .btn-small {
+                min-width: 70px !important;
+                padding: 13px 10px !important;
+                font-size: 0.85rem !important;
+            }
+            
+            .order-item {
+                padding: 12px;
+            }
+            
+            .order-actions {
+                gap: 5px;
+            }
+            
+            .action-btn {
+                padding: 5px 8px;
+                font-size: 0.7rem;
+            }
+            
+            /* 手机端时间输入框优化 - 更大更明显 */
+            input[type="datetime-local"],
+            .time-input-group input[type="datetime-local"] {
+                font-size: 17px !important;
+                padding: 16px 18px !important;
+                min-height: 54px !important;
+                border: 2px solid var(--border-color) !important;
+            }
+            
+            /* 时间输入组在手机端调整 */
+            .time-input-group {
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            .time-input-group input[type="datetime-local"] {
+                width: 100%;
+                padding-right: 50px !important;
+            }
+            
+            .time-input-group .btn-small {
+                width: 100%;
+                min-width: 0 !important;
+                padding: 14px 12px !important;
+                font-size: 0.9rem !important;
+            }
         }
         
-        /* 针对大屏幕优化 */
+        /* 针对iPhone SE等小屏幕手机 */
+        @media (max-width: 375px) {
+            .time-input-group input[type="datetime-local"] {
+                font-size: 16px !important;
+                padding: 14px 16px !important;
+                min-height: 50px !important;
+            }
+            
+            .time-input-group .btn-small {
+                padding: 12px 10px !important;
+            }
+        }
+        
+        /* 增强响应式设计 */
+        @media (max-width: 414px) {
+            .input-group {
+                margin-bottom: 16px;
+            }
+            
+            .time-input-group {
+                flex-wrap: wrap;
+            }
+            
+            .time-input-group input[type="datetime-local"] {
+                min-height: 56px;
+                padding: 16px 18px !important;
+            }
+        }
+        
         @media (min-width: 768px) {
             .container {
                 max-width: 680px;
             }
             
-            .time-btn-group {
-                flex-wrap: nowrap;
+            .button-group {
+                flex-direction: row;
+                flex-wrap: wrap;
             }
             
-            .time-btn-small {
+            .btn {
+                width: auto;
+                flex: 1;
+            }
+            
+            .time-input-group .btn-small {
+                min-width: 80px;
+            }
+            
+            .order-actions {
+                justify-content: flex-end;
+            }
+            
+            .action-btn {
                 flex: none;
                 min-width: 80px;
             }
         }
         
-        /* 保持原样... */
-        /* 以下是原有的CSS代码，为了简洁我只展示了需要修改的部分 */
+        /* 修复iOS Safari的日期时间选择器问题 */
+        @media screen and (max-width: 767px) {
+            input[type="datetime-local"] {
+                -webkit-appearance: none;
+                appearance: none;
+                display: block;
+                width: 100%;
+                box-sizing: border-box;
+            }
+            
+            /* iOS特定优化 */
+            @supports (-webkit-touch-callout: none) {
+                input[type="datetime-local"] {
+                    font-size: 17px !important;
+                    line-height: 1.8 !important;
+                }
+            }
+        }
         
+        /* 增加时间输入框在移动端的可读性 */
+        @media (hover: none) and (pointer: coarse) {
+            input[type="datetime-local"] {
+                font-size: 17px !important; /* iOS推荐大小 */
+                padding-top: 16px !important;
+                padding-bottom: 16px !important;
+                min-height: 56px !important;
+            }
+            
+            .time-input-group .btn-small {
+                min-height: 56px !important;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+        }
+        
+        /* 加载动画 */
+        .loading {
+            display: flex;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-dark);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            transition: opacity 0.3s ease;
+            opacity: 1;
+        }
+        
+        .loading.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top: 3px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* 动画效果 */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .card, .order-item, .boss-statistics {
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        /* 滚动条美化 */
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 3px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 3px;
+        }
+        
+        /* 订单筛选器 */
+        .boss-filter {
+            margin-bottom: 16px;
+        }
+        
+        .boss-select {
+            width: 100%;
+            padding: 10px 14px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            color: var(--text-light);
+            font-size: 0.9rem;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238a8a9c' d='M6 8L2 4h8z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            padding-right: 40px;
+        }
+        
+        /* 快速操作栏 */
+        .quick-actions {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+        
+        .quick-action-btn {
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-light);
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            flex: 1;
+        }
+        
+        .quick-action-btn:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--secondary-color);
+        }
+        
+        /* 状态指示器 */
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 6px;
+        }
+        
+        .status-pending .status-indicator {
+            background-color: var(--warning-color);
+            box-shadow: 0 0 8px var(--warning-color);
+        }
+        
+        .status-completed .status-indicator {
+            background-color: var(--success-color);
+            box-shadow: 0 0 8px var(--success-color);
+        }
     </style>
 </head>
 <body>
@@ -522,41 +1122,19 @@
                 <input type="text" id="boss-name" placeholder="请输入老板名称">
             </div>
             
-            <!-- 优化后的开始时间部分 -->
             <div class="input-group">
                 <label for="start-time"><i class="fas fa-play-circle"></i> 开始时间 <span class="required">*</span></label>
                 <div class="time-input-group">
                     <input type="datetime-local" id="start-time">
-                </div>
-                <div class="time-btn-group">
-                    <button id="set-start-now-btn" class="time-btn-small">
-                        <i class="fas fa-clock"></i> 设为当前
-                    </button>
-                    <button id="set-start-1h-ago-btn" class="time-btn-small">
-                        <i class="fas fa-backward"></i> 1小时前
-                    </button>
-                    <button id="set-start-30m-ago-btn" class="time-btn-small">
-                        <i class="fas fa-backward"></i> 30分钟前
-                    </button>
+                    <button id="set-now-btn" class="btn btn-secondary btn-small">现在</button>
                 </div>
             </div>
             
-            <!-- 优化后的结束时间部分 -->
             <div class="input-group">
                 <label for="end-time"><i class="fas fa-stop-circle"></i> 结束时间 <span class="optional">(可选)</span></label>
                 <div class="time-input-group">
                     <input type="datetime-local" id="end-time">
-                </div>
-                <div class="time-btn-group">
-                    <button id="set-end-now-btn" class="time-btn-small">
-                        <i class="fas fa-clock"></i> 设为当前
-                    </button>
-                    <button id="set-end-1h-later-btn" class="time-btn-small">
-                        <i class="fas fa-forward"></i> 1小时后
-                    </button>
-                    <button id="set-end-30m-later-btn" class="time-btn-small">
-                        <i class="fas fa-forward"></i> 30分钟后
-                    </button>
+                    <button id="set-current-btn" class="btn btn-secondary btn-small">当前</button>
                 </div>
             </div>
             
@@ -588,9 +1166,150 @@
             </div>
         </div>
         
-        <!-- 其余HTML代码保持不变... -->
-        
+        <!-- 待结束订单卡片 - 优化布局 -->
+        <div class="card" id="pending-orders-card" style="display:none;">
+            <h2 class="card-title"><i class="fas fa-history"></i> 待结束订单</h2>
+            
+            <!-- 快速操作栏 -->
+            <div class="quick-actions">
+                <button class="quick-action-btn" id="filter-all">
+                    <i class="fas fa-list"></i> 全部
+                </button>
+                <button class="quick-action-btn" id="filter-pending">
+                    <i class="fas fa-clock"></i> 进行中
+                </button>
+                <button class="quick-action-btn" id="filter-completed">
+                    <i class="fas fa-check-circle"></i> 已完成
+                </button>
+            </div>
+            
+            <!-- 老板筛选 -->
+            <div class="boss-filter">
+                <select class="boss-select" id="boss-filter-select">
+                    <option value="all">全部老板</option>
+                    <option value="散客">散客</option>
+                    <!-- 动态添加老板选项 -->
+                </select>
+            </div>
+            
+            <!-- 订单列表 -->
+            <div class="pending-orders" id="pending-orders-container">
+                <div class="empty-state" id="no-orders">
+                    <i class="fas fa-clipboard-list"></i>
+                    <p>暂无待结束订单</p>
+                    <p class="subtext">添加新的订单后，将在这里显示</p>
+                </div>
+            </div>
+            
+            <!-- 老板消费统计 -->
+            <div id="boss-statistics-container">
+                <!-- 动态生成统计 -->
+            </div>
+            
+            <div class="button-group" style="margin-top: 20px;">
+                <button id="clear-all-btn" class="btn btn-secondary"><i class="fas fa-trash-alt"></i> 清除所有</button>
+                <button id="export-btn" class="btn btn-secondary"><i class="fas fa-file-export"></i> 导出数据</button>
+            </div>
+        </div>
     </div>
+    
+    <!-- 编辑订单模态框 -->
+    <div class="modal" id="edit-order-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title"><i class="fas fa-edit"></i> 编辑订单</h3>
+                <button class="close-btn" id="close-edit-modal">&times;</button>
+            </div>
+            
+            <div class="input-group">
+                <label><i class="fas fa-money-bill-wave"></i> 每小时单价</label>
+                <div class="price-buttons" id="edit-price-buttons">
+                    <button class="price-btn" data-price="55">55</button>
+                    <button class="price-btn" data-price="60">60</button>
+                    <button class="price-btn" data-price="65">65</button>
+                    <button class="price-btn" data-price="70">70</button>
+                    <button class="price-btn" data-price="75">75</button>
+                    <button class="price-btn" data-price="80">80</button>
+                    <button class="price-btn" data-price="90">90</button>
+                    <button class="price-btn" data-price="100">100</button>
+                </div>
+                <input type="number" id="edit-price-per-hour" min="0" step="1" placeholder="输入单价" inputmode="decimal">
+            </div>
+            
+            <div class="input-group">
+                <label for="edit-companion-name"><i class="fas fa-user"></i> 陪玩名称</label>
+                <input type="text" id="edit-companion-name" placeholder="请输入陪玩名称">
+            </div>
+            
+            <div class="input-group">
+                <label for="edit-boss-name"><i class="fas fa-crown"></i> 老板名称</label>
+                <input type="text" id="edit-boss-name" placeholder="请输入老板名称">
+            </div>
+            
+            <div class="input-group">
+                <label for="edit-start-time"><i class="fas fa-play-circle"></i> 开始时间</label>
+                <input type="datetime-local" id="edit-start-time">
+            </div>
+            
+            <div class="input-group">
+                <label for="edit-end-time"><i class="fas fa-stop-circle"></i> 结束时间</label>
+                <div class="time-input-group">
+                    <input type="datetime-local" id="edit-end-time">
+                    <button id="edit-set-current-btn" class="btn btn-secondary btn-small">设为当前</button>
+                </div>
+            </div>
+            
+            <div class="button-group" style="margin-top: 20px;">
+                <button id="edit-complete-btn" class="btn btn-add"><i class="fas fa-check-circle"></i> 结束订单</button>
+                <button id="save-edit-btn" class="btn btn-primary"><i class="fas fa-save"></i> 保存修改</button>
+                <button id="cancel-edit-btn" class="btn btn-secondary"><i class="fas fa-times"></i> 取消</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 老板详情模态框 -->
+    <div class="modal" id="boss-detail-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title"><i class="fas fa-user-tie"></i> <span id="boss-detail-name">老板详情</span></h3>
+                <button class="close-btn" id="close-boss-detail-modal">&times;</button>
+            </div>
+            
+            <div class="result-item">
+                <span>订单总数:</span>
+                <span class="result-value" id="boss-total-orders">0</span>
+            </div>
+            <div class="result-item">
+                <span>已完成:</span>
+                <span class="result-value" id="boss-completed-orders">0</span>
+            </div>
+            <div class="result-item">
+                <span>进行中:</span>
+                <span class="result-value" id="boss-pending-orders">0</span>
+            </div>
+            <div class="result-item">
+                <span>总消费:</span>
+                <span class="result-value" id="boss-total-cost">0.00元</span>
+            </div>
+            
+            <h4 style="margin-top: 20px; margin-bottom: 10px; color: var(--secondary-color); font-size: 0.95rem;">
+                <i class="fas fa-list"></i> 订单列表
+            </h4>
+            
+            <div class="pending-orders" id="boss-orders-list" style="max-height: 300px;">
+                <!-- 动态生成老板订单 -->
+            </div>
+            
+            <div class="button-group" style="margin-top: 20px;">
+                <button id="close-boss-detail-btn" class="btn btn-secondary">关闭</button>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <p>枫枫电竞 &copy; 2023 | 专业计时计费系统</p>
+        <p style="margin-top: 5px; font-size: 0.7rem;">数据保存在本地浏览器中</p>
+    </footer>
     
     <script>
         // ============ 精简版代码 ============
@@ -609,14 +1328,8 @@
             bossNameEl: document.getElementById('boss-name'),
             startTimeEl: document.getElementById('start-time'),
             endTimeEl: document.getElementById('end-time'),
-            // 新的按钮元素
-            setStartNowBtn: document.getElementById('set-start-now-btn'),
-            setStart1hAgoBtn: document.getElementById('set-start-1h-ago-btn'),
-            setStart30mAgoBtn: document.getElementById('set-start-30m-ago-btn'),
-            setEndNowBtn: document.getElementById('set-end-now-btn'),
-            setEnd1hLaterBtn: document.getElementById('set-end-1h-later-btn'),
-            setEnd30mLaterBtn: document.getElementById('set-end-30m-later-btn'),
-            // 其他元素保持不变...
+            setNowBtn: document.getElementById('set-now-btn'),
+            setCurrentBtn: document.getElementById('set-current-btn'),
             addToPendingBtn: document.getElementById('add-to-pending-btn'),
             calculateTimeBtn: document.getElementById('calculate-time-btn'),
             calculateCostBtn: document.getElementById('calculate-cost-btn'),
@@ -627,12 +1340,39 @@
             noOrdersEl: document.getElementById('no-orders'),
             priceButtons: document.querySelectorAll('#price-buttons .price-btn'),
             pendingCountEl: document.getElementById('pending-count'),
-            loadingEl: document.getElementById('loading')
+            bossStatisticsContainer: document.getElementById('boss-statistics-container'),
+            bossFilterSelect: document.getElementById('boss-filter-select'),
+            filterAllBtn: document.getElementById('filter-all'),
+            filterPendingBtn: document.getElementById('filter-pending'),
+            filterCompletedBtn: document.getElementById('filter-completed'),
+            tabNewBtn: document.getElementById('tab-new'),
+            tabPendingBtn: document.getElementById('tab-pending'),
+            newOrderCard: document.getElementById('new-order-card'),
+            pendingOrdersCard: document.getElementById('pending-orders-card'),
+            editOrderModal: document.getElementById('edit-order-modal'),
+            closeEditModalBtn: document.getElementById('close-edit-modal'),
+            cancelEditBtn: document.getElementById('cancel-edit-btn'),
+            saveEditBtn: document.getElementById('save-edit-btn'),
+            editCompleteBtn: document.getElementById('edit-complete-btn'),
+            editPricePerHourEl: document.getElementById('edit-price-per-hour'),
+            editCompanionNameEl: document.getElementById('edit-companion-name'),
+            editBossNameEl: document.getElementById('edit-boss-name'),
+            editStartTimeEl: document.getElementById('edit-start-time'),
+            editEndTimeEl: document.getElementById('edit-end-time'),
+            editSetCurrentBtn: document.getElementById('edit-set-current-btn'),
+            editPriceButtons: document.querySelectorAll('#edit-price-buttons .price-btn'),
+            loadingEl: document.getElementById('loading'),
+            clearAllBtn: document.getElementById('clear-all-btn'),
+            exportBtn: document.getElementById('export-btn')
         };
         
         // 全局变量
         let pendingOrders = [];
+        let editingOrderId = null;
         let selectedPrice = null;
+        let editSelectedPrice = null;
+        let currentFilter = 'all'; // all, pending, completed
+        let currentBossFilter = 'all';
         
         // 精确计算金额
         function calculateExactAmount(billableHours, pricePerHour) {
@@ -661,6 +1401,27 @@
             }
         }
         
+        // 标签页切换
+        DOM.tabNewBtn.addEventListener('click', () => switchTab('new'));
+        DOM.tabPendingBtn.addEventListener('click', () => switchTab('pending'));
+        
+        function switchTab(tab) {
+            if (tab === 'new') {
+                DOM.tabNewBtn.classList.add('active');
+                DOM.tabPendingBtn.classList.remove('active');
+                DOM.newOrderCard.style.display = 'block';
+                DOM.pendingOrdersCard.style.display = 'none';
+            } else {
+                DOM.tabPendingBtn.classList.add('active');
+                DOM.tabNewBtn.classList.remove('active');
+                DOM.newOrderCard.style.display = 'none';
+                DOM.pendingOrdersCard.style.display = 'block';
+                updateBossFilterOptions();
+                updatePendingOrdersDisplay();
+                updateBossStatistics();
+            }
+        }
+        
         // 更新时间显示
         function updateCurrentTime() {
             const now = new Date();
@@ -670,30 +1431,34 @@
             DOM.currentTimeEl.textContent = `${hours}:${minutes}:${seconds}`;
         }
         
-        // 格式化日期时间
-        function formatDateTimeForInput(date) {
-            const year = date.getFullYear();
-            const month = String(date.getMonth() + 1).padStart(2, '0');
-            const day = String(date.getDate()).padStart(2, '0');
-            const hours = String(date.getHours()).padStart(2, '0');
-            const minutes = String(date.getMinutes()).padStart(2, '0');
-            return `${year}-${month}-${day}T${hours}:${minutes}`;
-        }
-        
-        // 初始化时间输入
+        // 初始化时间 - 优化为更易读的格式
         function initializeTimes() {
             const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
             
-            // 默认开始时间为当前时间
-            DOM.startTimeEl.value = formatDateTimeForInput(now);
+            // 生成格式化的时间字符串
+            const datetimeLocalNow = `${year}-${month}-${day}T${hours}:${minutes}`;
+            
+            // 如果开始时间没有值，设置当前时间
+            if (!DOM.startTimeEl.value) {
+                DOM.startTimeEl.value = datetimeLocalNow;
+            }
             
             // 结束时间留空
-            DOM.endTimeEl.value = '';
+            if (!DOM.endTimeEl.value) {
+                DOM.endTimeEl.value = '';
+            }
             
-            // 优化移动端显示
+            // 强制重新渲染输入框以确保iOS正确显示
             setTimeout(() => {
-                DOM.startTimeEl.style.fontSize = '15px';
-                DOM.endTimeEl.style.fontSize = '15px';
+                DOM.startTimeEl.style.fontSize = '17px';
+                DOM.startTimeEl.style.padding = '16px 18px';
+                DOM.endTimeEl.style.fontSize = '17px';
+                DOM.endTimeEl.style.padding = '16px 18px';
             }, 100);
         }
         
@@ -732,6 +1497,12 @@
                 hours: hours,
                 minutes: remainingMinutes
             };
+        }
+        
+        function calculateOrderCost(order) {
+            const timeResult = calculateTimeDifference(order.startTime, order.endTime);
+            if (timeResult.error) return 0;
+            return calculateExactAmount(timeResult.billableHoursNum, (order.pricePerHour || 0));
         }
         
         // 显示时长结果
@@ -783,52 +1554,8 @@
             DOM.timeResults.style.display = 'none';
         }
         
-        // 时间按钮事件处理
-        DOM.setStartNowBtn.addEventListener('click', function() {
-            const now = new Date();
-            DOM.startTimeEl.value = formatDateTimeForInput(now);
-            showToast('开始时间已设置为当前时间', 'info');
-        });
-        
-        DOM.setStart1hAgoBtn.addEventListener('click', function() {
-            const now = new Date();
-            const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000);
-            DOM.startTimeEl.value = formatDateTimeForInput(oneHourAgo);
-            showToast('开始时间已设置为1小时前', 'info');
-        });
-        
-        DOM.setStart30mAgoBtn.addEventListener('click', function() {
-            const now = new Date();
-            const thirtyMinutesAgo = new Date(now.getTime() - 30 * 60 * 1000);
-            DOM.startTimeEl.value = formatDateTimeForInput(thirtyMinutesAgo);
-            showToast('开始时间已设置为30分钟前', 'info');
-        });
-        
-        DOM.setEndNowBtn.addEventListener('click', function() {
-            const now = new Date();
-            DOM.endTimeEl.value = formatDateTimeForInput(now);
-            showToast('结束时间已设置为当前时间', 'info');
-        });
-        
-        DOM.setEnd1hLaterBtn.addEventListener('click', function() {
-            const now = new Date();
-            const oneHourLater = new Date(now.getTime() + 60 * 60 * 1000);
-            DOM.endTimeEl.value = formatDateTimeForInput(oneHourLater);
-            showToast('结束时间已设置为1小时后', 'info');
-        });
-        
-        DOM.setEnd30mLaterBtn.addEventListener('click', function() {
-            const now = new Date();
-            const thirtyMinutesLater = new Date(now.getTime() + 30 * 60 * 1000);
-            DOM.endTimeEl.value = formatDateTimeForInput(thirtyMinutesLater);
-            showToast('结束时间已设置为30分钟后', 'info');
-        });
-        
-        // 主要按钮事件
-        DOM.calculateTimeBtn.addEventListener('click', displayTimeResults);
-        DOM.calculateCostBtn.addEventListener('click', displayCostResults);
-        
-        DOM.addToPendingBtn.addEventListener('click', function() {
+        // 添加到待结束订单
+        function addToPendingOrders() {
             if (!DOM.startTimeEl.value) {
                 showToast('请填写开始时间', 'warning');
                 return;
@@ -864,6 +1591,9 @@
             pendingOrders.push(order);
             saveToLocalStorage();
             
+            updatePendingOrdersDisplay();
+            updateBossStatistics();
+            
             // 重置表单
             DOM.pricePerHourEl.value = '';
             DOM.companionNameEl.value = '';
@@ -876,7 +1606,845 @@
             selectedPrice = null;
             
             showToast('订单已添加', 'success');
+        }
+        
+        // 更新老板筛选选项
+        function updateBossFilterOptions() {
+            const bossNames = [...new Set(pendingOrders.map(order => order.bossName || '散客'))].sort();
+            
+            // 清空现有选项（除了"全部老板"）
+            while (DOM.bossFilterSelect.options.length > 1) {
+                DOM.bossFilterSelect.remove(1);
+            }
+            
+            // 添加老板选项
+            bossNames.forEach(bossName => {
+                const option = document.createElement('option');
+                option.value = bossName;
+                option.textContent = bossName;
+                DOM.bossFilterSelect.appendChild(option);
+            });
+        }
+        
+        // 更新待结束订单显示
+        function updatePendingOrdersDisplay() {
+            DOM.pendingOrdersContainer.innerHTML = '';
+            
+            // 更新订单数量
+            const pendingCount = pendingOrders.filter(order => !order.endTime).length;
+            DOM.pendingCountEl.textContent = pendingCount > 0 ? pendingCount : '';
+            
+            // 筛选订单
+            let filteredOrders = pendingOrders;
+            
+            // 按状态筛选
+            if (currentFilter === 'pending') {
+                filteredOrders = filteredOrders.filter(order => !order.endTime);
+            } else if (currentFilter === 'completed') {
+                filteredOrders = filteredOrders.filter(order => order.endTime);
+            }
+            
+            // 按老板筛选
+            if (currentBossFilter !== 'all') {
+                filteredOrders = filteredOrders.filter(order => 
+                    (order.bossName || '散客') === currentBossFilter
+                );
+            }
+            
+            // 按时间倒序排序
+            filteredOrders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+            
+            if (filteredOrders.length === 0) {
+                let message = '';
+                if (currentFilter === 'pending') {
+                    message = '暂无进行中订单';
+                } else if (currentFilter === 'completed') {
+                    message = '暂无已完成订单';
+                } else if (currentBossFilter !== 'all') {
+                    message = `该老板暂无${currentFilter === 'all' ? '' : currentFilter === 'pending' ? '进行中' : '已完成'}订单`;
+                } else {
+                    message = '暂无待结束订单';
+                }
+                
+                DOM.pendingOrdersContainer.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-clipboard-list"></i>
+                        <p>${message}</p>
+                        <p class="subtext">${currentFilter === 'all' && currentBossFilter === 'all' ? '添加新的订单后，将在这里显示' : '尝试切换筛选条件'}</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // 创建订单元素
+            filteredOrders.forEach(order => {
+                const orderElement = createOrderElement(order);
+                DOM.pendingOrdersContainer.appendChild(orderElement);
+            });
+        }
+        
+        // 生成小程序文本
+        function generateMiniProgramText(order, timeResult, totalCost) {
+            const startDate = new Date(order.startTime);
+            const year = startDate.getFullYear();
+            const month = String(startDate.getMonth() + 1).padStart(2, '0');
+            const day = String(startDate.getDate()).padStart(2, '0');
+            const hours = String(startDate.getHours()).padStart(2, '0');
+            const minutes = String(startDate.getMinutes()).padStart(2, '0');
+            
+            let miniProgramText = '';
+            miniProgramText += '接单群：枫枫电竞派单群\n';
+            miniProgramText += `项目：PUBG-${order.pricePerHour || 0}\n`;
+            miniProgramText += `老板：${order.bossName || '散客'}\n`;
+            miniProgramText += '所属人：\n';
+            miniProgramText += '数量：1\n';
+            miniProgramText += `金额：${totalCost.toFixed(2)}\n`;
+            miniProgramText += '接待：xs\n';  // 固定为"xs"
+            miniProgramText += `接单时间：${year}-${month}-${day}-${hours}:${minutes}`;
+            
+            return miniProgramText;
+        }
+        
+        // 创建订单元素
+        function createOrderElement(order) {
+            const isCompleted = order.endTime !== null;
+            const timeResult = calculateTimeDifference(order.startTime, order.endTime);
+            
+            let durationText = '进行中';
+            let billableText = '待计算';
+            let costText = '待计算';
+            let totalCost = 0;
+            
+            if (!timeResult.error && isCompleted) {
+                durationText = timeResult.actualDuration;
+                billableText = timeResult.billableHours;
+                
+                if (order.pricePerHour > 0) {
+                    totalCost = calculateExactAmount(timeResult.billableHoursNum, order.pricePerHour);
+                    costText = `${totalCost.toFixed(2)}元`;
+                }
+            } else if (!timeResult.error && !isCompleted) {
+                const currentResult = calculateTimeDifference(order.startTime);
+                durationText = `${currentResult.actualDuration} (进行中)`;
+                billableText = currentResult.billableHours;
+                
+                if (order.pricePerHour > 0) {
+                    totalCost = calculateExactAmount(currentResult.billableHoursNum, order.pricePerHour);
+                    costText = `${totalCost.toFixed(2)}元 (预估)`;
+                }
+            }
+            
+            // 生成报单文本
+            const copyText = generateCopyText(order, timeResult, isCompleted);
+            
+            const orderDiv = document.createElement('div');
+            orderDiv.className = `order-item ${isCompleted ? 'completed' : ''}`;
+            orderDiv.setAttribute('data-id', order.id);
+            orderDiv.setAttribute('data-boss', order.bossName || '散客');
+            orderDiv.setAttribute('data-status', isCompleted ? 'completed' : 'pending');
+            
+            orderDiv.innerHTML = `
+                <div class="order-header">
+                    <div class="order-title">
+                        <span class="status-indicator"></span>
+                        订单 #${order.id.toString().slice(-6)}
+                    </div>
+                    <div class="order-status ${isCompleted ? 'status-completed' : 'status-pending'}">
+                        ${isCompleted ? '已完成' : '进行中'}
+                    </div>
+                </div>
+                
+                <div class="order-info">
+                    <div class="info-row">
+                        <span class="info-label">陪玩:</span>
+                        <span class="info-value">${order.companionName}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">老板:</span>
+                        <span class="info-value">${order.bossName || '散客'}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">开始:</span>
+                        <span class="info-value">${formatDateTimeForDisplay(new Date(order.startTime))}</span>
+                    </div>
+                    ${order.endTime ? `
+                        <div class="info-row">
+                            <span class="info-label">结束:</span>
+                            <span class="info-value">${formatDateTimeForDisplay(new Date(order.endTime))}</span>
+                        </div>
+                    ` : ''}
+                    <div class="info-row">
+                        <span class="info-label">时长:</span>
+                        <span class="info-value">${durationText}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">计费:</span>
+                        <span class="info-value">${billableText}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">单价:</span>
+                        <span class="info-value">${order.pricePerHour > 0 ? `${order.pricePerHour}元/小时` : '未设置'}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">费用:</span>
+                        <span class="info-value">${costText}</span>
+                    </div>
+                </div>
+                
+                <div class="order-actions">
+                    <button class="action-btn edit-btn" onclick="editOrder(${order.id})">
+                        <i class="fas fa-edit"></i> 编辑
+                    </button>
+                    ${!isCompleted ? `
+                        <button class="action-btn complete-btn" onclick="completeOrder(${order.id})">
+                            <i class="fas fa-check-circle"></i> 结束
+                        </button>
+                    ` : ''}
+                    <button class="action-btn delete-btn" onclick="deleteOrder(${order.id})">
+                        <i class="fas fa-trash"></i> 删除
+                    </button>
+                </div>
+                
+                <div class="copy-area">
+                    <div class="copy-text">${copyText}</div>
+                    <button class="copy-btn" onclick="copyTextToClipboard(${order.id})">
+                        <i class="fas fa-copy"></i> 复制报单文本
+                    </button>
+                </div>
+                
+                <div class="copy-area" style="margin-top: 8px;">
+                    <button class="copy-btn" onclick="copyMiniProgramText(${order.id})">
+                        <i class="fas fa-mobile-alt"></i> 复制小程序文本
+                    </button>
+                </div>
+            `;
+            
+            return orderDiv;
+        }
+        
+        // 生成报单文本
+        function generateCopyText(order, timeResult, isCompleted) {
+            const startDate = new Date(order.startTime);
+            const month = startDate.getMonth() + 1;
+            const day = startDate.getDate();
+            
+            const startHours = String(startDate.getHours()).padStart(2, '0');
+            const startMinutes = String(startDate.getMinutes()).padStart(2, '0');
+            
+            let copyText = `${month}/${day}\n`;
+            copyText += `开始时间:${startHours}:${startMinutes}  ${order.bossName || '散客'}\n`;
+            
+            if (isCompleted && order.endTime && !timeResult.error) {
+                const endDate = new Date(order.endTime);
+                const endHours = String(endDate.getHours()).padStart(2, '0');
+                const endMinutes = String(endDate.getMinutes()).padStart(2, '0');
+                
+                const billableHours = timeResult.billableHoursNum;
+                const formattedHours = billableHours % 1 === 0 ? billableHours.toFixed(0) : billableHours.toFixed(1);
+                
+                copyText += `结束时间:${endHours}:${endMinutes} ${formattedHours}h ${order.pricePerHour}/h 已报备`;
+            }
+            
+            return copyText;
+        }
+        
+        // 格式化日期时间
+        function formatDateTimeForDisplay(date) {
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            return `${month}-${day} ${hours}:${minutes}`;
+        }
+        
+        function formatDateTimeForInput(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            return `${year}-${month}-${day}T${hours}:${minutes}`;
+        }
+        
+        // 复制功能
+        window.copyTextToClipboard = async function(orderId) {
+            try {
+                const orderElement = document.querySelector(`.order-item[data-id="${orderId}"]`);
+                if (!orderElement) {
+                    showToast('未找到订单', 'error');
+                    return;
+                }
+                
+                const copyTextElement = orderElement.querySelector('.copy-text');
+                if (!copyTextElement) {
+                    showToast('未找到复制文本', 'error');
+                    return;
+                }
+                
+                const textToCopy = copyTextElement.textContent.trim();
+                const copyBtn = orderElement.querySelector('.copy-btn');
+                
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    await navigator.clipboard.writeText(textToCopy);
+                    copyBtn.classList.add('copied');
+                    copyBtn.innerHTML = '<i class="fas fa-check"></i> 已复制';
+                    setTimeout(() => {
+                        copyBtn.classList.remove('copied');
+                        copyBtn.innerHTML = '<i class="fas fa-copy"></i> 复制报单文本';
+                    }, 2000);
+                    showToast('已复制到剪贴板', 'success');
+                } else {
+                    fallbackCopyText(textToCopy, copyBtn);
+                }
+            } catch (error) {
+                console.error('复制失败:', error);
+                showToast('复制失败', 'error');
+            }
+        };
+        
+        // 复制小程序文本
+        window.copyMiniProgramText = async function(orderId) {
+            try {
+                const orderIndex = pendingOrders.findIndex(order => order.id === orderId);
+                if (orderIndex === -1) {
+                    showToast('未找到订单', 'error');
+                    return;
+                }
+                
+                const order = pendingOrders[orderIndex];
+                const timeResult = calculateTimeDifference(order.startTime, order.endTime);
+                let totalCost = 0;
+                
+                if (!timeResult.error) {
+                    totalCost = calculateExactAmount(timeResult.billableHoursNum, order.pricePerHour || 0);
+                }
+                
+                // 生成小程序文本
+                const textToCopy = generateMiniProgramText(order, timeResult, totalCost);
+                
+                // 找到对应的复制按钮
+                const orderElement = document.querySelector(`.order-item[data-id="${orderId}"]`);
+                const copyBtn = orderElement ? orderElement.querySelectorAll('.copy-btn')[1] : null;
+                
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    await navigator.clipboard.writeText(textToCopy);
+                    if (copyBtn) {
+                        copyBtn.classList.add('copied');
+                        copyBtn.innerHTML = '<i class="fas fa-check"></i> 已复制';
+                        setTimeout(() => {
+                            copyBtn.classList.remove('copied');
+                            copyBtn.innerHTML = '<i class="fas fa-mobile-alt"></i> 复制小程序文本';
+                        }, 2000);
+                    }
+                    showToast('小程序文本已复制到剪贴板', 'success');
+                } else {
+                    // 备用复制方法
+                    fallbackCopyTextMiniProgram(textToCopy, copyBtn);
+                }
+            } catch (error) {
+                console.error('复制小程序文本失败:', error);
+                showToast('复制失败', 'error');
+            }
+        };
+        
+        function fallbackCopyText(text, copyBtn) {
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            textArea.style.position = 'fixed';
+            textArea.style.left = '-999999px';
+            textArea.style.top = '-999999px';
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            
+            try {
+                const successful = document.execCommand('copy');
+                document.body.removeChild(textArea);
+                
+                if (successful) {
+                    copyBtn.classList.add('copied');
+                    copyBtn.innerHTML = '<i class="fas fa-check"></i> 已复制';
+                    setTimeout(() => {
+                        copyBtn.classList.remove('copied');
+                        copyBtn.innerHTML = '<i class="fas fa-copy"></i> 复制报单文本';
+                    }, 2000);
+                    showToast('已复制到剪贴板', 'success');
+                } else {
+                    showToast('复制失败，请手动选择文本复制', 'error');
+                }
+            } catch (error) {
+                showToast('复制失败', 'error');
+            }
+        }
+        
+        function fallbackCopyTextMiniProgram(text, copyBtn) {
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            textArea.style.position = 'fixed';
+            textArea.style.left = '-999999px';
+            textArea.style.top = '-999999px';
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            
+            try {
+                const successful = document.execCommand('copy');
+                document.body.removeChild(textArea);
+                
+                if (successful) {
+                    if (copyBtn) {
+                        copyBtn.classList.add('copied');
+                        copyBtn.innerHTML = '<i class="fas fa-check"></i> 已复制';
+                        setTimeout(() => {
+                            copyBtn.classList.remove('copied');
+                            copyBtn.innerHTML = '<i class="fas fa-mobile-alt"></i> 复制小程序文本';
+                        }, 2000);
+                    }
+                    showToast('小程序文本已复制到剪贴板', 'success');
+                } else {
+                    showToast('复制失败，请手动选择文本复制', 'error');
+                }
+            } catch (error) {
+                showToast('复制失败', 'error');
+            }
+        }
+        
+        // 订单操作
+        window.editOrder = function(id) {
+            const orderIndex = pendingOrders.findIndex(order => order.id === id);
+            if (orderIndex === -1) return;
+            
+            const order = pendingOrders[orderIndex];
+            editingOrderId = id;
+            editSelectedPrice = order.pricePerHour || null;
+            
+            DOM.editPricePerHourEl.value = order.pricePerHour || '';
+            DOM.editCompanionNameEl.value = order.companionName;
+            DOM.editBossNameEl.value = order.bossName;
+            DOM.editStartTimeEl.value = formatDateTimeForInput(new Date(order.startTime));
+            DOM.editEndTimeEl.value = order.endTime ? formatDateTimeForInput(new Date(order.endTime)) : '';
+            
+            DOM.editPriceButtons.forEach(btn => {
+                if (parseFloat(btn.dataset.price) === order.pricePerHour) {
+                    btn.classList.add('selected');
+                } else {
+                    btn.classList.remove('selected');
+                }
+            });
+            
+            DOM.editOrderModal.classList.add('show');
+        };
+        
+        window.completeOrder = function(id) {
+            const orderIndex = pendingOrders.findIndex(order => order.id === id);
+            if (orderIndex === -1) return;
+            
+            if (confirm('确定要结束这个订单吗？')) {
+                const now = new Date();
+                const datetimeLocal = formatDateTimeForInput(now);
+                
+                pendingOrders[orderIndex].endTime = datetimeLocal;
+                pendingOrders[orderIndex].status = 'completed';
+                saveToLocalStorage();
+                updatePendingOrdersDisplay();
+                updateBossStatistics();
+                showToast('订单已结束', 'success');
+            }
+        };
+        
+        window.deleteOrder = function(id) {
+            if (confirm('确定要删除这个订单吗？')) {
+                pendingOrders = pendingOrders.filter(order => order.id !== id);
+                saveToLocalStorage();
+                updatePendingOrdersDisplay();
+                updateBossStatistics();
+                showToast('订单已删除', 'success');
+            }
+        };
+        
+        // 保存编辑
+        DOM.saveEditBtn.addEventListener('click', function() {
+            if (!editingOrderId) return;
+            
+            const orderIndex = pendingOrders.findIndex(order => order.id === editingOrderId);
+            if (orderIndex === -1) return;
+            
+            const pricePerHour = editSelectedPrice || parseFloat(DOM.editPricePerHourEl.value) || 0;
+            const companionName = DOM.editCompanionNameEl.value || '未填写';
+            const bossName = DOM.editBossNameEl.value || '散客';
+            const startTime = DOM.editStartTimeEl.value;
+            const endTime = DOM.editEndTimeEl.value || null;
+            
+            if (endTime) {
+                const start = new Date(startTime);
+                const end = new Date(endTime);
+                
+                if (end <= start) {
+                    showToast('结束时间不能早于开始时间', 'error');
+                    return;
+                }
+            }
+            
+            pendingOrders[orderIndex].pricePerHour = pricePerHour;
+            pendingOrders[orderIndex].companionName = companionName;
+            pendingOrders[orderIndex].bossName = bossName;
+            pendingOrders[orderIndex].startTime = startTime;
+            pendingOrders[orderIndex].endTime = endTime;
+            pendingOrders[orderIndex].status = endTime ? 'completed' : 'pending';
+            
+            saveToLocalStorage();
+            updatePendingOrdersDisplay();
+            updateBossStatistics();
+            
+            DOM.editOrderModal.classList.remove('show');
+            editingOrderId = null;
+            editSelectedPrice = null;
+            
+            showToast('订单已更新', 'success');
         });
+        
+        // 在编辑中完成订单
+        DOM.editCompleteBtn.addEventListener('click', function() {
+            if (!editingOrderId) return;
+            
+            const orderIndex = pendingOrders.findIndex(order => order.id === editingOrderId);
+            if (orderIndex === -1) return;
+            
+            const pricePerHour = editSelectedPrice || parseFloat(DOM.editPricePerHourEl.value) || 0;
+            const companionName = DOM.editCompanionNameEl.value || '未填写';
+            const bossName = DOM.editBossNameEl.value || '散客';
+            const startTime = DOM.editStartTimeEl.value;
+            
+            let endTime = DOM.editEndTimeEl.value;
+            
+            if (!endTime) {
+                const now = new Date();
+                endTime = formatDateTimeForInput(now);
+                DOM.editEndTimeEl.value = endTime;
+            }
+            
+            const start = new Date(startTime);
+            const end = new Date(endTime);
+            
+            if (end <= start) {
+                showToast('结束时间不能早于开始时间', 'error');
+                return;
+            }
+            
+            if (confirm('确定要结束这个订单吗？')) {
+                pendingOrders[orderIndex].pricePerHour = pricePerHour;
+                pendingOrders[orderIndex].companionName = companionName;
+                pendingOrders[orderIndex].bossName = bossName;
+                pendingOrders[orderIndex].startTime = startTime;
+                pendingOrders[orderIndex].endTime = endTime;
+                pendingOrders[orderIndex].status = 'completed';
+                
+                saveToLocalStorage();
+                updatePendingOrdersDisplay();
+                updateBossStatistics();
+                
+                DOM.editOrderModal.classList.remove('show');
+                editingOrderId = null;
+                editSelectedPrice = null;
+                
+                showToast('订单已结束', 'success');
+            }
+        });
+        
+        // 关闭模态框
+        DOM.closeEditModalBtn.addEventListener('click', () => DOM.editOrderModal.classList.remove('show'));
+        DOM.cancelEditBtn.addEventListener('click', () => DOM.editOrderModal.classList.remove('show'));
+        DOM.editOrderModal.addEventListener('click', (e) => {
+            if (e.target === DOM.editOrderModal) DOM.editOrderModal.classList.remove('show');
+        });
+        
+        // 价格按钮事件
+        DOM.priceButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                DOM.priceButtons.forEach(btn => btn.classList.remove('selected'));
+                this.classList.add('selected');
+                selectedPrice = parseFloat(this.dataset.price);
+                DOM.pricePerHourEl.value = selectedPrice;
+            });
+        });
+        
+        DOM.editPriceButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                DOM.editPriceButtons.forEach(btn => btn.classList.remove('selected'));
+                this.classList.add('selected');
+                editSelectedPrice = parseFloat(this.dataset.price);
+                DOM.editPricePerHourEl.value = editSelectedPrice;
+            });
+        });
+        
+        // 手动输入价格时清除按钮选择
+        DOM.pricePerHourEl.addEventListener('input', function() {
+            if (this.value && parseFloat(this.value) !== selectedPrice) {
+                DOM.priceButtons.forEach(btn => btn.classList.remove('selected'));
+                selectedPrice = null;
+            }
+        });
+        
+        DOM.editPricePerHourEl.addEventListener('input', function() {
+            if (this.value && parseFloat(this.value) !== editSelectedPrice) {
+                DOM.editPriceButtons.forEach(btn => btn.classList.remove('selected'));
+                editSelectedPrice = null;
+            }
+        });
+        
+        // 时间设置按钮
+        DOM.setNowBtn.addEventListener('click', function() {
+            const now = new Date();
+            const datetimeLocal = formatDateTimeForInput(now);
+            DOM.startTimeEl.value = datetimeLocal;
+            DOM.timeResults.style.display = 'none';
+            DOM.costResults.style.display = 'none';
+            
+            // 强制iOS重新渲染
+            DOM.startTimeEl.style.fontSize = '17px';
+            DOM.startTimeEl.style.padding = '16px 18px';
+        });
+        
+        DOM.setCurrentBtn.addEventListener('click', function() {
+            const now = new Date();
+            const datetimeLocal = formatDateTimeForInput(now);
+            DOM.endTimeEl.value = datetimeLocal;
+            DOM.timeResults.style.display = 'none';
+            DOM.costResults.style.display = 'none';
+            
+            // 强制iOS重新渲染
+            DOM.endTimeEl.style.fontSize = '17px';
+            DOM.endTimeEl.style.padding = '16px 18px';
+        });
+        
+        DOM.editSetCurrentBtn.addEventListener('click', function() {
+            const now = new Date();
+            const datetimeLocal = formatDateTimeForInput(now);
+            DOM.editEndTimeEl.value = datetimeLocal;
+        });
+        
+        // 筛选按钮事件
+        DOM.filterAllBtn.addEventListener('click', () => {
+            currentFilter = 'all';
+            updateFilterButtons();
+            updatePendingOrdersDisplay();
+        });
+        
+        DOM.filterPendingBtn.addEventListener('click', () => {
+            currentFilter = 'pending';
+            updateFilterButtons();
+            updatePendingOrdersDisplay();
+        });
+        
+        DOM.filterCompletedBtn.addEventListener('click', () => {
+            currentFilter = 'completed';
+            updateFilterButtons();
+            updatePendingOrdersDisplay();
+        });
+        
+        DOM.bossFilterSelect.addEventListener('change', function() {
+            currentBossFilter = this.value;
+            updatePendingOrdersDisplay();
+        });
+        
+        function updateFilterButtons() {
+            [DOM.filterAllBtn, DOM.filterPendingBtn, DOM.filterCompletedBtn].forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            if (currentFilter === 'all') DOM.filterAllBtn.classList.add('active');
+            else if (currentFilter === 'pending') DOM.filterPendingBtn.classList.add('active');
+            else if (currentFilter === 'completed') DOM.filterCompletedBtn.classList.add('active');
+        }
+        
+        // 更新老板消费统计
+        function updateBossStatistics() {
+            DOM.bossStatisticsContainer.innerHTML = '';
+            
+            if (pendingOrders.length === 0) {
+                return;
+            }
+            
+            // 统计每个老板的消费总额
+            const bossStats = {};
+            
+            pendingOrders.forEach(order => {
+                const bossName = order.bossName || '散客';
+                const cost = calculateOrderCost(order);
+                
+                if (!bossStats[bossName]) {
+                    bossStats[bossName] = {
+                        total: 0,
+                        orderCount: 0,
+                        pendingCount: 0
+                    };
+                }
+                
+                bossStats[bossName].total += cost;
+                bossStats[bossName].orderCount += 1;
+                if (!order.endTime) bossStats[bossName].pendingCount += 1;
+            });
+            
+            // 转换为数组并按消费总额降序排序
+            const bossStatsArray = Object.entries(bossStats)
+                .map(([name, stats]) => ({
+                    name,
+                    total: Math.round(stats.total * 100) / 100,
+                    orderCount: stats.orderCount,
+                    pendingCount: stats.pendingCount
+                }))
+                .sort((a, b) => b.total - a.total);
+            
+            // 计算所有老板的总消费
+            const grandTotal = bossStatsArray.reduce((sum, boss) => sum + boss.total, 0);
+            const exactGrandTotal = Math.round(grandTotal * 100) / 100;
+            
+            // 创建统计卡片
+            const statsCard = document.createElement('div');
+            statsCard.className = 'boss-statistics';
+            
+            let statsHTML = `
+                <h3><i class="fas fa-chart-bar"></i> 消费统计</h3>
+            `;
+            
+            if (bossStatsArray.length === 0) {
+                statsHTML += `<div class="empty-state" style="padding: 20px;"><p>暂无消费统计</p></div>`;
+            } else {
+                // 显示每个老板的消费统计
+                bossStatsArray.forEach(boss => {
+                    statsHTML += `
+                        <div class="boss-stat-item">
+                            <span class="boss-name" onclick="showBossDetails('${boss.name.replace(/'/g, "\\'")}')">
+                                ${boss.name}
+                                <small style="color: var(--text-gray); font-weight: normal; margin-left: 4px;">
+                                    (${boss.orderCount}单, ${boss.pendingCount}进行中)
+                                </small>
+                            </span>
+                            <span class="boss-total">${boss.total.toFixed(2)}元</span>
+                        </div>
+                    `;
+                });
+                
+                // 显示总计
+                statsHTML += `
+                    <div class="boss-stat-item" style="border-bottom: none; margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border-color);">
+                        <span class="boss-name" style="font-weight: 600;">总计</span>
+                        <span class="boss-total-amount">${exactGrandTotal.toFixed(2)}元</span>
+                    </div>
+                `;
+            }
+            
+            statsCard.innerHTML = statsHTML;
+            DOM.bossStatisticsContainer.appendChild(statsCard);
+        }
+        
+        // 显示老板详情
+        window.showBossDetails = function(bossName) {
+            const bossOrders = pendingOrders.filter(order => (order.bossName || '散客') === bossName);
+            
+            if (bossOrders.length === 0) {
+                showToast('该老板没有订单', 'info');
+                return;
+            }
+            
+            const totalOrders = bossOrders.length;
+            const completedOrders = bossOrders.filter(order => order.endTime).length;
+            const pendingOrdersCount = totalOrders - completedOrders;
+            
+            let totalCost = 0;
+            bossOrders.forEach(order => {
+                totalCost += calculateOrderCost(order);
+            });
+            totalCost = Math.round(totalCost * 100) / 100;
+            
+            // 更新模态框内容
+            document.getElementById('boss-detail-name').textContent = bossName;
+            document.getElementById('boss-total-orders').textContent = totalOrders;
+            document.getElementById('boss-completed-orders').textContent = completedOrders;
+            document.getElementById('boss-pending-orders').textContent = pendingOrdersCount;
+            document.getElementById('boss-total-cost').textContent = `${totalCost.toFixed(2)}元`;
+            
+            // 清空并添加订单列表
+            const ordersList = document.getElementById('boss-orders-list');
+            ordersList.innerHTML = '';
+            
+            // 按创建时间倒序排序
+            const sortedOrders = [...bossOrders].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+            
+            sortedOrders.forEach(order => {
+                const orderElement = createOrderElement(order);
+                ordersList.appendChild(orderElement);
+            });
+            
+            // 显示模态框
+            document.getElementById('boss-detail-modal').classList.add('show');
+        };
+        
+        // 关闭老板详情模态框
+        document.getElementById('close-boss-detail-modal').addEventListener('click', () => {
+            document.getElementById('boss-detail-modal').classList.remove('show');
+        });
+        
+        document.getElementById('close-boss-detail-btn').addEventListener('click', () => {
+            document.getElementById('boss-detail-modal').classList.remove('show');
+        });
+        
+        document.getElementById('boss-detail-modal').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('boss-detail-modal')) {
+                document.getElementById('boss-detail-modal').classList.remove('show');
+            }
+        });
+        
+        // 清除所有订单
+        DOM.clearAllBtn.addEventListener('click', function() {
+            if (pendingOrders.length === 0) {
+                showToast('没有订单可清除', 'info');
+                return;
+            }
+            
+            if (confirm('确定要清除所有订单吗？此操作不可撤销。')) {
+                pendingOrders = [];
+                saveToLocalStorage();
+                updatePendingOrdersDisplay();
+                updateBossStatistics();
+                showToast('所有订单已清除', 'success');
+            }
+        });
+        
+        // 导出数据
+        DOM.exportBtn.addEventListener('click', function() {
+            if (pendingOrders.length === 0) {
+                showToast('没有订单可导出', 'info');
+                return;
+            }
+            
+            const csv = convertOrdersToCSV();
+            const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `枫枫电竞订单_${new Date().toLocaleDateString('zh-CN').replace(/\//g, '-')}.csv`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            showToast('数据已导出', 'success');
+        });
+        
+        function convertOrdersToCSV() {
+            let csv = '订单ID,陪玩名称,老板名称,开始时间,结束时间,单价,状态,创建时间,计费时长,总费用\n';
+            
+            pendingOrders.forEach(order => {
+                const timeResult = calculateTimeDifference(order.startTime, order.endTime);
+                const totalCost = calculateOrderCost(order);
+                
+                csv += `"${order.id}","${order.companionName}","${order.bossName || '散客'}","${formatDateTimeForDisplay(new Date(order.startTime))}",`;
+                csv += `"${order.endTime ? formatDateTimeForDisplay(new Date(order.endTime)) : ''}","${order.pricePerHour}","${order.endTime ? '已完成' : '进行中'}",`;
+                csv += `"${formatDateTimeForDisplay(new Date(order.createdAt))}","${timeResult.billableHours}","${totalCost.toFixed(2)}"\n`;
+            });
+            
+            return csv;
+        }
         
         // 重置表单
         DOM.resetBtn.addEventListener('click', function() {
@@ -893,23 +2461,10 @@
             showToast('表单已重置', 'info');
         });
         
-        // 价格按钮事件
-        DOM.priceButtons.forEach(button => {
-            button.addEventListener('click', function() {
-                DOM.priceButtons.forEach(btn => btn.classList.remove('selected'));
-                this.classList.add('selected');
-                selectedPrice = parseFloat(this.dataset.price);
-                DOM.pricePerHourEl.value = selectedPrice;
-            });
-        });
-        
-        // 手动输入价格时清除按钮选择
-        DOM.pricePerHourEl.addEventListener('input', function() {
-            if (this.value && parseFloat(this.value) !== selectedPrice) {
-                DOM.priceButtons.forEach(btn => btn.classList.remove('selected'));
-                selectedPrice = null;
-            }
-        });
+        // 主要按钮事件
+        DOM.calculateTimeBtn.addEventListener('click', displayTimeResults);
+        DOM.calculateCostBtn.addEventListener('click', displayCostResults);
+        DOM.addToPendingBtn.addEventListener('click', addToPendingOrders);
         
         // 显示提示消息
         function showToast(message, type = 'info') {
@@ -980,6 +2535,21 @@
             
             // 初始化时间输入
             initializeTimes();
+            
+            // 设置默认筛选按钮状态
+            updateFilterButtons();
+            
+            // 添加页面可见性变化监听
+            document.addEventListener('visibilitychange', function() {
+                if (!document.hidden) {
+                    loadFromLocalStorage();
+                    updatePendingOrdersDisplay();
+                    updateBossStatistics();
+                }
+            });
+            
+            // 添加beforeunload事件
+            window.addEventListener('beforeunload', saveToLocalStorage);
         }
         
         // 页面加载完成后初始化

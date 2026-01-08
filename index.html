@@ -206,13 +206,15 @@
             appearance: none;
         }
         
-        /* 特别优化时间输入框 */
+        /* 特别优化时间输入框 - 完全自定义解决方案 */
         input[type="datetime-local"] {
             font-size: 16px !important; /* 防止iOS Safari自动缩放 */
-            min-height: 44px !important; /* 最小触摸区域尺寸 */
-            padding: 12px 14px !important;
+            min-height: 50px !important; /* 增加高度 */
+            padding: 14px 16px !important; /* 增加内边距 */
             line-height: 1.4 !important;
             color-scheme: dark; /* 告诉浏览器这是深色主题输入 */
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+            letter-spacing: 0.3px;
         }
         
         input:focus, select:focus {
@@ -262,12 +264,12 @@
             box-shadow: 0 2px 8px rgba(77, 171, 247, 0.2);
         }
         
-        /* 精简的时间输入组 */
+        /* 重新设计时间输入组 - 解决iOS压缩问题 */
         .time-input-group {
             display: flex;
-            gap: 8px;
-            align-items: center;
-            position: relative;
+            gap: 10px;
+            align-items: stretch; /* 改为stretch让元素等高 */
+            margin-bottom: 5px;
         }
         
         .time-input-group input {
@@ -278,25 +280,31 @@
         .time-input-group input[type="datetime-local"] {
             flex: 1;
             min-width: 0;
-            font-size: 16px; /* 确保字体足够大 */
-            padding: 12px 14px;
-            min-height: 44px;
+            font-size: 17px !important; /* iOS推荐字体大小 */
+            padding: 15px 18px !important; /* 更大的内边距 */
+            min-height: 52px !important;
             line-height: 1.4;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%238a8a9c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='18' rx='2' ry='2'%3E%3C/rect%3E%3Cline x1='16' y1='2' x2='16' y2='6'%3E%3C/line%3E%3Cline x1='8' y1='2' x2='8' y2='6'%3E%3C/line%3E%3Cline x1='3' y1='10' x2='21' y2='10'%3E%3C/line%3E%3C/svg%3E");
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%238a8a9c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='18' rx='2' ry='2'%3E%3C/rect%3E%3Cline x1='16' y1='2' x2='16' y2='6'%3E%3C/line%3E%3Cline x1='8' y1='2' x2='8' y2='6'%3E%3C/line%3E%3Cline x1='3' y1='10' x2='21' y2='10'%3E%3C/line%3E%3C/svg%3E");
             background-repeat: no-repeat;
-            background-position: right 14px center;
-            background-size: 20px;
-            padding-right: 40px; /* 为右侧图标留出空间 */
+            background-position: right 16px center;
+            background-size: 24px;
+            padding-right: 50px !important; /* 为右侧图标留出更多空间 */
+            -webkit-appearance: none;
+            appearance: none;
+            border: 2px solid var(--border-color);
         }
         
         .time-input-group .btn-small {
-            min-width: 70px;
-            padding: 12px 10px;
-            font-size: 0.85rem;
+            min-width: 80px !important; /* 增大按钮宽度 */
+            padding: 14px 12px !important;
+            font-size: 0.9rem !important;
             white-space: nowrap;
             display: flex;
             align-items: center;
             justify-content: center;
+            border: 2px solid var(--border-color);
+            height: auto; /* 让按钮高度自适应 */
+            align-self: stretch; /* 确保按钮和时间输入框等高 */
         }
         
         /* 精简的按钮设计 */
@@ -745,14 +753,15 @@
         
         /* 模态框中的时间输入框 */
         .modal-content input[type="datetime-local"] {
-            font-size: 16px !important;
-            min-height: 44px !important;
-            padding: 12px 14px !important;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%238a8a9c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='18' rx='2' ry='2'%3E%3C/rect%3E%3Cline x1='16' y1='2' x2='16' y2='6'%3E%3C/line%3E%3Cline x1='8' y1='2' x2='8' y2='6'%3E%3C/line%3E%3Cline x1='3' y1='10' x2='21' y2='10'%3E%3C/line%3E%3C/svg%3E");
+            font-size: 17px !important;
+            min-height: 52px !important;
+            padding: 15px 18px !important;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%238a8a9c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='18' rx='2' ry='2'%3E%3C/rect%3E%3Cline x1='16' y1='2' x2='16' y2='6'%3E%3C/line%3E%3Cline x1='8' y1='2' x2='8' y2='6'%3E%3C/line%3E%3Cline x1='3' y1='10' x2='21' y2='10'%3E%3C/line%3E%3C/svg%3E");
             background-repeat: no-repeat;
-            background-position: right 14px center;
-            background-size: 20px;
-            padding-right: 40px;
+            background-position: right 16px center;
+            background-size: 24px;
+            padding-right: 50px !important;
+            border: 2px solid var(--border-color);
         }
         
         /* 响应式设计 */
@@ -784,9 +793,9 @@
             }
             
             .time-input-group .btn-small {
-                min-width: 70px;
-                padding: 12px 10px;
-                font-size: 0.85rem;
+                min-width: 70px !important;
+                padding: 13px 10px !important;
+                font-size: 0.85rem !important;
             }
             
             .order-item {
@@ -802,23 +811,16 @@
                 font-size: 0.7rem;
             }
             
-            /* 手机端时间输入框优化 */
+            /* 手机端时间输入框优化 - 更大更明显 */
             input[type="datetime-local"],
             .time-input-group input[type="datetime-local"] {
-                font-size: 15px !important;
-                padding: 10px 12px !important;
-                min-height: 42px !important;
+                font-size: 17px !important;
+                padding: 16px 18px !important;
+                min-height: 54px !important;
+                border: 2px solid var(--border-color) !important;
             }
             
-            input[type="datetime-local"]::placeholder {
-                font-size: 14px;
-                color: var(--text-gray);
-                opacity: 0.7;
-            }
-        }
-        
-        /* 针对小屏幕手机的进一步优化 */
-        @media (max-width: 360px) {
+            /* 时间输入组在手机端调整 */
             .time-input-group {
                 flex-direction: column;
                 gap: 8px;
@@ -826,11 +828,27 @@
             
             .time-input-group input[type="datetime-local"] {
                 width: 100%;
+                padding-right: 50px !important;
             }
             
             .time-input-group .btn-small {
                 width: 100%;
-                min-width: 0;
+                min-width: 0 !important;
+                padding: 14px 12px !important;
+                font-size: 0.9rem !important;
+            }
+        }
+        
+        /* 针对iPhone SE等小屏幕手机 */
+        @media (max-width: 375px) {
+            .time-input-group input[type="datetime-local"] {
+                font-size: 16px !important;
+                padding: 14px 16px !important;
+                min-height: 50px !important;
+            }
+            
+            .time-input-group .btn-small {
+                padding: 12px 10px !important;
             }
         }
         
@@ -845,8 +863,8 @@
             }
             
             .time-input-group input[type="datetime-local"] {
-                min-height: 46px;
-                padding: 13px 14px;
+                min-height: 56px;
+                padding: 16px 18px !important;
             }
         }
         
@@ -866,7 +884,7 @@
             }
             
             .time-input-group .btn-small {
-                min-width: 70px;
+                min-width: 80px;
             }
             
             .order-actions {
@@ -888,14 +906,30 @@
                 width: 100%;
                 box-sizing: border-box;
             }
+            
+            /* iOS特定优化 */
+            @supports (-webkit-touch-callout: none) {
+                input[type="datetime-local"] {
+                    font-size: 17px !important;
+                    line-height: 1.8 !important;
+                }
+            }
         }
         
         /* 增加时间输入框在移动端的可读性 */
         @media (hover: none) and (pointer: coarse) {
             input[type="datetime-local"] {
-                font-size: 16px; /* 确保在触摸设备上足够大 */
-                padding-top: 14px;
-                padding-bottom: 14px;
+                font-size: 17px !important; /* iOS推荐大小 */
+                padding-top: 16px !important;
+                padding-bottom: 16px !important;
+                min-height: 56px !important;
+            }
+            
+            .time-input-group .btn-small {
+                min-height: 56px !important;
+                display: flex;
+                align-items: center;
+                justify-content: center;
             }
         }
         
@@ -1397,7 +1431,7 @@
             DOM.currentTimeEl.textContent = `${hours}:${minutes}:${seconds}`;
         }
         
-        // 初始化时间
+        // 初始化时间 - 优化为更易读的格式
         function initializeTimes() {
             const now = new Date();
             const year = now.getFullYear();
@@ -1406,15 +1440,26 @@
             const hours = String(now.getHours()).padStart(2, '0');
             const minutes = String(now.getMinutes()).padStart(2, '0');
             
+            // 生成格式化的时间字符串
             const datetimeLocalNow = `${year}-${month}-${day}T${hours}:${minutes}`;
             
+            // 如果开始时间没有值，设置当前时间
             if (!DOM.startTimeEl.value) {
                 DOM.startTimeEl.value = datetimeLocalNow;
             }
             
+            // 结束时间留空
             if (!DOM.endTimeEl.value) {
                 DOM.endTimeEl.value = '';
             }
+            
+            // 强制重新渲染输入框以确保iOS正确显示
+            setTimeout(() => {
+                DOM.startTimeEl.style.fontSize = '17px';
+                DOM.startTimeEl.style.padding = '16px 18px';
+                DOM.endTimeEl.style.fontSize = '17px';
+                DOM.endTimeEl.style.padding = '16px 18px';
+            }, 100);
         }
         
         // 时间计算函数
@@ -2154,6 +2199,10 @@
             DOM.startTimeEl.value = datetimeLocal;
             DOM.timeResults.style.display = 'none';
             DOM.costResults.style.display = 'none';
+            
+            // 强制iOS重新渲染
+            DOM.startTimeEl.style.fontSize = '17px';
+            DOM.startTimeEl.style.padding = '16px 18px';
         });
         
         DOM.setCurrentBtn.addEventListener('click', function() {
@@ -2162,6 +2211,10 @@
             DOM.endTimeEl.value = datetimeLocal;
             DOM.timeResults.style.display = 'none';
             DOM.costResults.style.display = 'none';
+            
+            // 强制iOS重新渲染
+            DOM.endTimeEl.style.fontSize = '17px';
+            DOM.endTimeEl.style.padding = '16px 18px';
         });
         
         DOM.editSetCurrentBtn.addEventListener('click', function() {

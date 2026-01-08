@@ -206,11 +206,26 @@
             appearance: none;
         }
         
+        /* 特别优化时间输入框 */
+        input[type="datetime-local"] {
+            font-size: 16px !important; /* 防止iOS Safari自动缩放 */
+            min-height: 44px !important; /* 最小触摸区域尺寸 */
+            padding: 12px 14px !important;
+            line-height: 1.4 !important;
+            color-scheme: dark; /* 告诉浏览器这是深色主题输入 */
+        }
+        
         input:focus, select:focus {
             outline: none;
             border-color: var(--secondary-color);
             box-shadow: 0 0 0 2px rgba(77, 171, 247, 0.15);
             background: rgba(77, 171, 247, 0.05);
+        }
+        
+        input[type="datetime-local"]:focus {
+            border-color: var(--secondary-color) !important;
+            box-shadow: 0 0 0 3px rgba(77, 171, 247, 0.25) !important;
+            outline: none !important;
         }
         
         /* 精简的价格按钮 */
@@ -252,6 +267,7 @@
             display: flex;
             gap: 8px;
             align-items: center;
+            position: relative;
         }
         
         .time-input-group input {
@@ -259,11 +275,28 @@
             min-width: 0;
         }
         
+        .time-input-group input[type="datetime-local"] {
+            flex: 1;
+            min-width: 0;
+            font-size: 16px; /* 确保字体足够大 */
+            padding: 12px 14px;
+            min-height: 44px;
+            line-height: 1.4;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%238a8a9c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='18' rx='2' ry='2'%3E%3C/rect%3E%3Cline x1='16' y1='2' x2='16' y2='6'%3E%3C/line%3E%3Cline x1='8' y1='2' x2='8' y2='6'%3E%3C/line%3E%3Cline x1='3' y1='10' x2='21' y2='10'%3E%3C/line%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            background-size: 20px;
+            padding-right: 40px; /* 为右侧图标留出空间 */
+        }
+        
         .time-input-group .btn-small {
-            min-width: 60px;
-            padding: 10px 12px;
-            font-size: 0.8rem;
+            min-width: 70px;
+            padding: 12px 10px;
+            font-size: 0.85rem;
             white-space: nowrap;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         
         /* 精简的按钮设计 */
@@ -710,6 +743,18 @@
             opacity: 1;
         }
         
+        /* 模态框中的时间输入框 */
+        .modal-content input[type="datetime-local"] {
+            font-size: 16px !important;
+            min-height: 44px !important;
+            padding: 12px 14px !important;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%238a8a9c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='18' rx='2' ry='2'%3E%3C/rect%3E%3Cline x1='16' y1='2' x2='16' y2='6'%3E%3C/line%3E%3Cline x1='8' y1='2' x2='8' y2='6'%3E%3C/line%3E%3Cline x1='3' y1='10' x2='21' y2='10'%3E%3C/line%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            background-size: 20px;
+            padding-right: 40px;
+        }
+        
         /* 响应式设计 */
         @media (max-width: 480px) {
             body {
@@ -739,9 +784,9 @@
             }
             
             .time-input-group .btn-small {
-                min-width: 55px;
-                padding: 9px 10px;
-                font-size: 0.75rem;
+                min-width: 70px;
+                padding: 12px 10px;
+                font-size: 0.85rem;
             }
             
             .order-item {
@@ -755,6 +800,53 @@
             .action-btn {
                 padding: 5px 8px;
                 font-size: 0.7rem;
+            }
+            
+            /* 手机端时间输入框优化 */
+            input[type="datetime-local"],
+            .time-input-group input[type="datetime-local"] {
+                font-size: 15px !important;
+                padding: 10px 12px !important;
+                min-height: 42px !important;
+            }
+            
+            input[type="datetime-local"]::placeholder {
+                font-size: 14px;
+                color: var(--text-gray);
+                opacity: 0.7;
+            }
+        }
+        
+        /* 针对小屏幕手机的进一步优化 */
+        @media (max-width: 360px) {
+            .time-input-group {
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            .time-input-group input[type="datetime-local"] {
+                width: 100%;
+            }
+            
+            .time-input-group .btn-small {
+                width: 100%;
+                min-width: 0;
+            }
+        }
+        
+        /* 增强响应式设计 */
+        @media (max-width: 414px) {
+            .input-group {
+                margin-bottom: 16px;
+            }
+            
+            .time-input-group {
+                flex-wrap: wrap;
+            }
+            
+            .time-input-group input[type="datetime-local"] {
+                min-height: 46px;
+                padding: 13px 14px;
             }
         }
         
@@ -784,6 +876,26 @@
             .action-btn {
                 flex: none;
                 min-width: 80px;
+            }
+        }
+        
+        /* 修复iOS Safari的日期时间选择器问题 */
+        @media screen and (max-width: 767px) {
+            input[type="datetime-local"] {
+                -webkit-appearance: none;
+                appearance: none;
+                display: block;
+                width: 100%;
+                box-sizing: border-box;
+            }
+        }
+        
+        /* 增加时间输入框在移动端的可读性 */
+        @media (hover: none) and (pointer: coarse) {
+            input[type="datetime-local"] {
+                font-size: 16px; /* 确保在触摸设备上足够大 */
+                padding-top: 14px;
+                padding-bottom: 14px;
             }
         }
         
